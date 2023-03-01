@@ -1,35 +1,42 @@
 package com.cashew.budgetservice.DAO.Entities;
 
-import com.cashew.budgetservice.DAO.CustomSerializers.UserDetailsSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Set;
 
 @Entity
-@JsonSerialize(using = UserDetailsSerializer.class)
+@EqualsAndHashCode
 public class UserDetails {
 
     @Id
     @GeneratedValue
-    @Getter
-    @Setter
+    @Getter @Setter
     private Long id;
 
-    @OneToOne(cascade=CascadeType.ALL)
-    @Getter
-    @Setter
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @Getter @Setter
     private User user;
 
-    @OneToMany(cascade=CascadeType.ALL)
+    @OneToMany(cascade=CascadeType.PERSIST)
     @Getter
     @Setter
-    private List<UserCheck> userChecks;
+    private Set<UserCheck> userChecks;
 
-    @ManyToMany(cascade=CascadeType.ALL)
+    @OneToMany
     @Getter
     @Setter
-    private List<Party> parties;
+    private Set<User> IncomingFriendRequests;
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @Getter
+    @Setter
+    private Set<User> friends;
+
+    @ManyToMany(cascade=CascadeType.PERSIST)
+    @Getter
+    @Setter
+    private Set<Party> parties;
 }

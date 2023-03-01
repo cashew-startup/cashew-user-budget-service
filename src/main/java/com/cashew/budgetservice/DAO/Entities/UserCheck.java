@@ -12,12 +12,12 @@ public class UserCheck {
     @Setter
     private Long id;
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne
     @Getter
     @Setter
     private UserDetails userDetails;
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne
     @Getter
     @Setter
     private Receipt receipt;
