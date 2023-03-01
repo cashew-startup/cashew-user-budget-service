@@ -22,7 +22,7 @@ public class Product {
     @Setter
     private String description;
 
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne
     @Getter
     @Setter
     private Price price;

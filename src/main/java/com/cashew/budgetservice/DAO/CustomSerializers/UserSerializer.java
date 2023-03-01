@@ -1,7 +1,6 @@
 package com.cashew.budgetservice.DAO.CustomSerializers;
 
 
-import com.cashew.budgetservice.DAO.Entities.Party;
 import com.cashew.budgetservice.DAO.Entities.User;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,13 +30,16 @@ public class UserSerializer extends StdSerializer<User> {
         generator.writeNumberField("id", user.getId());
         generator.writeStringField("username", user.getUsername());
         generator.writeStringField("email", user.getEmail());
-        generator.writeStringField("createdDate", user.getDate().toString());
-        generator.writeArrayFieldStart("parties");
-        for (Party party : user.getUserDetails().getParties()){
-            generator.writeNumberField("id",party.getId());
-            generator.writeStringField("name",party.getName());
-        }
-        generator.writeEndArray();
+        generator.writeStringField("date", user.getDate().toString());
+//        generator.writeArrayFieldStart("parties");
+//
+//        for (Party party : user.getUserDetails().getParties()){
+//            generator.writeStartObject();
+//            generator.writeNumberField("id",party.getId());
+//            generator.writeStringField("name",party.getName());
+//            generator.writeEndObject();
+//        }
+//        generator.writeEndArray();
         generator.writeEndObject();
     }
 

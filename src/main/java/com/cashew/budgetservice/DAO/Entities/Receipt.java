@@ -15,7 +15,7 @@ public class Receipt {
     @Setter
     private Long id;
 
-    @OneToMany(cascade=CascadeType.ALL)
+    @OneToMany
     @Getter
     @Setter
     private List<Product> products;

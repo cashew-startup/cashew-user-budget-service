@@ -7,33 +7,28 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @JsonSerialize(using = UserSerializer.class)
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    @Getter
-    @Setter
+    @Getter @Setter
     private Long id;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private String username;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private String email;
 
     @CreatedDate
-    @Getter
-    @Setter
-    private LocalDate date;
+    @Getter @Setter
+    private LocalDateTime date;
 
-    @OneToOne(cascade=CascadeType.ALL)
-    @Getter
-    @Setter
+    @OneToOne(cascade=CascadeType.PERSIST)
+    @Getter @Setter
     private UserDetails userDetails;
 }
 
