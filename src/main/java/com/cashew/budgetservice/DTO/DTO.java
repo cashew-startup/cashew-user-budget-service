@@ -22,7 +22,7 @@ public class DTO {
         try {
             return mapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {
-            log.info("JsomProcessingException");
+            log.info("JsonProcessingException");
             return "";
         }
     }

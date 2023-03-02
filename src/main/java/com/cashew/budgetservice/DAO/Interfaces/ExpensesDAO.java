@@ -1,15 +1,13 @@
 package com.cashew.budgetservice.DAO.Interfaces;
 
 import com.cashew.budgetservice.DTO.ExpensesDTO;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-@Component
 public interface ExpensesDAO {
-    ExpensesDTO getExpensesForLastDay();
-    ExpensesDTO getExpencesForLastWeek();
-    ExpensesDTO getExpensesForLastMonth();
-    ExpensesDTO getExpencesForLastYear();
-    ExpensesDTO getExpencesForCustomPeriod(LocalDateTime from, LocalDateTime to);
+    ExpensesDTO getExpensesForToday(String username);
+    ExpensesDTO getExpencesForLastWeek(String username);
+    ExpensesDTO getExpensesForLastMonth(String username);
+    ExpensesDTO getExpencesForLastYear(String username);
+    ExpensesDTO getExpencesForCustomPeriod(String username,  LocalDateTime from, LocalDateTime to);
 }

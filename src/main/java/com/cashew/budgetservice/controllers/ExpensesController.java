@@ -1,41 +1,40 @@
 package com.cashew.budgetservice.controllers;
 
+import com.cashew.budgetservice.DAO.Interfaces.ExpensesDAO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController("/api/v1/expenses")
+@RestController
+@RequestMapping("/api/v1/expenses")
 public class ExpensesController {
-//    @Autowired
-//    private ExpensesDAO dao;
+    @Autowired
+    private ExpensesDAO dao;
 
-    @GetMapping(path = "/{id}/day")
-    public ResponseEntity<?> getExpensesPerDay(@PathVariable(value = "id") Long id){
+    @GetMapping(path = "/{username}/day")
+    public ResponseEntity<?> getExpensesforToday(@PathVariable(value = "username") String username){
+        return new ResponseEntity<>(dao.getExpensesForToday(username),HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{username}/week")
+    public ResponseEntity<?> getExpensesPerWeek(@PathVariable(value = "username") String username){
+        return new ResponseEntity<>(dao.getExpensesForToday(username),HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{username}/month")
+    public ResponseEntity<?> getExpensesPerMonth(@PathVariable(value = "username") String username){
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @GetMapping(path = "/{id}/week")
-    public ResponseEntity<?> getExpensesPerWeek(@PathVariable(value = "id") Long id){
+    @GetMapping(path = "/{username}/year")
+    public ResponseEntity<?> getExpensesPerYear(@PathVariable(value = "username") String username){
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @GetMapping(path = "/{id}/month")
-    public ResponseEntity<?> getExpensesPerMonth(@PathVariable(value = "id") Long id){
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    @GetMapping(path = "/{id}/year")
-    public ResponseEntity<?> getExpensesPerYear(@PathVariable(value = "id") Long id){
-        // list of expenses for year(expenses for each month)
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    @GetMapping(path = "/{id}/period")
+    @GetMapping(path = "/{username}/period")
     public ResponseEntity<?> getExpensesPerCustomPeriod(
-            @PathVariable(value = "id") Long id,
+            @PathVariable(value = "username") String username,
             @RequestParam String from,
             @RequestParam String to){
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
