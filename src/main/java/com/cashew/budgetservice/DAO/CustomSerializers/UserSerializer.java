@@ -31,15 +31,6 @@ public class UserSerializer extends StdSerializer<User> {
         generator.writeStringField("username", user.getUsername());
         generator.writeStringField("email", user.getEmail());
         generator.writeStringField("date", user.getDate().toString());
-//        generator.writeArrayFieldStart("parties");
-//
-//        for (Party party : user.getUserDetails().getParties()){
-//            generator.writeStartObject();
-//            generator.writeNumberField("id",party.getId());
-//            generator.writeStringField("name",party.getName());
-//            generator.writeEndObject();
-//        }
-//        generator.writeEndArray();
         generator.writeEndObject();
     }
 
