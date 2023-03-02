@@ -1,26 +1,24 @@
 package com.cashew.budgetservice.DAO.Entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@Data
+@Accessors(chain = true)
 public class Receipt {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    @Getter
-    @Setter
     private Long id;
 
     @OneToMany
-    @Getter
-    @Setter
     private List<Product> products;
 
-    @Getter
-    @Setter
-    private LocalDate date;
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone="GMT")
+    private LocalDateTime date;
 }
