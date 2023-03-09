@@ -1,42 +1,49 @@
 package com.cashew.budgetservice.controllers;
 
-import com.cashew.budgetservice.DAO.Interfaces.ExpensesDAO;
+import com.cashew.budgetservice.DTO.ExpensesDTO.Request;
+import com.cashew.budgetservice.services.ExpensesService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/expenses")
 public class ExpensesController {
+    private ExpensesService expensesService;
+
     @Autowired
-    private ExpensesDAO dao;
-
-    @GetMapping(path = "/{username}/day")
-    public ResponseEntity<?> getExpensesforToday(@PathVariable(value = "username") String username){
-        return new ResponseEntity<>(dao.getExpensesForToday(username),HttpStatus.OK);
+    public ExpensesController(ExpensesService expensesService) {
+        this.expensesService = expensesService;
     }
 
-    @GetMapping(path = "/{username}/week")
-    public ResponseEntity<?> getExpensesPerWeek(@PathVariable(value = "username") String username){
-        return new ResponseEntity<>(dao.getExpensesForToday(username),HttpStatus.OK);
+    @GetMapping(path = "/day")
+    public ResponseEntity<?> getExpensesForToday(@RequestBody Request.perLastDay requestDTO){
+        return expensesService.getExpensesPerLastDay(requestDTO.getUsername());
     }
 
-    @GetMapping(path = "/{username}/month")
-    public ResponseEntity<?> getExpensesPerMonth(@PathVariable(value = "username") String username){
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    @GetMapping(path = "/week")
+    public ResponseEntity<?> getExpensesPerWeek(@RequestBody Request.perLastWeek requestDTO){
+        return expensesService.getExpensesPerLastWeek(requestDTO.getUsername());
     }
 
-    @GetMapping(path = "/{username}/year")
-    public ResponseEntity<?> getExpensesPerYear(@PathVariable(value = "username") String username){
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    @GetMapping(path = "/month")
+    public ResponseEntity<?> getExpensesPerMonth(@RequestBody Request.perLastMonth requestDTO){
+        return expensesService.getExpensesPerLastMonth(requestDTO.getUsername());
     }
 
-    @GetMapping(path = "/{username}/period")
-    public ResponseEntity<?> getExpensesPerCustomPeriod(
-            @PathVariable(value = "username") String username,
-            @RequestParam String from,
-            @RequestParam String to){
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    @GetMapping(path = "/year")
+    public ResponseEntity<?> getExpensesPerYear(@RequestBody Request.perLastYear requestDTO){
+        return expensesService.getExpensesPerLastYear(requestDTO.getUsername());
+    }
+
+    @GetMapping(path = "/period")
+    public ResponseEntity<?> getExpensesPerCustomPeriod(@RequestBody
+                                                            @DateTimeFormat(pattern = "dd.MM.yyyy")
+                                                                    Request.perCustomPeriod requestDTO){
+        return expensesService.getExpensesPerCustomPeriod(requestDTO.getUsername(), requestDTO.getFrom(), requestDTO.getTo());
     }
 }

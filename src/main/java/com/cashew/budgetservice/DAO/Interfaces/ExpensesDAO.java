@@ -1,13 +1,13 @@
 package com.cashew.budgetservice.DAO.Interfaces;
 
-import com.cashew.budgetservice.DTO.ExpensesDTO;
+import com.cashew.budgetservice.DTO.ExpensesDTO.Response.RequestedChecks;
 
 import java.time.LocalDateTime;
 
 public interface ExpensesDAO {
-    ExpensesDTO getExpensesForToday(String username);
-    ExpensesDTO getExpencesForLastWeek(String username);
-    ExpensesDTO getExpensesForLastMonth(String username);
-    ExpensesDTO getExpencesForLastYear(String username);
-    ExpensesDTO getExpencesForCustomPeriod(String username,  LocalDateTime from, LocalDateTime to);
+    RequestedChecks getExpensesPerLastDay(String username);
+    RequestedChecks getExpensesPerLastWeek(String username);
+    RequestedChecks getExpensesPerLastMonth(String username);
+    RequestedChecks getExpensesPerLastYear(String username);
+    RequestedChecks getExpensesPerCustomPeriod(String username, LocalDateTime from, LocalDateTime to);
 }

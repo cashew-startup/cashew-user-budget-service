@@ -8,8 +8,8 @@ import com.cashew.budgetservice.DTO.ExpensesDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Component
@@ -19,44 +19,47 @@ public class ExpensesDAOImpl implements ExpensesDAO {
     @Autowired
     UserRepository userRepository;
 
-    public Iterable<UserCheck> getUserChecks(String username, LocalDate from) throws NoSuchElementException {
-        Iterable<UserCheck> userChecks = userCheckRepository.findAllByUserDetailsAndDateAfter(
-                userRepository
+    public List<UserCheck> getUserChecks(String username, LocalDateTime from) throws NoSuchElementException {
+        long userDetailsId = userRepository
                 .findUserByUsername(username)
                 .orElseThrow()
                 .getUserDetails()
-                        .getId(), from);
-        return userChecks;
+                .getId();
+        return userCheckRepository.findAllByUserDetailsAndDateAfter(userDetailsId, from);
     }
 
     @Override
-    public ExpensesDTO getExpensesForToday(String username) {
-        Iterable<UserCheck> checks = getUserChecks(username, LocalDateTime.now().toLocalDate());
-        ExpensesDTO result = new ExpensesDTO();
-        result.setExpenses(checks);
-        return result;
+    public ExpensesDTO.Response.RequestedChecks getExpensesPerLastDay(String username) {
+        List<UserCheck> checks = getUserChecks(username, LocalDateTime.now().minusDays(1L));
+        return new ExpensesDTO.Response.RequestedChecks().setExpenses(checks);
     }
 
     @Override
-    public ExpensesDTO getExpencesForLastWeek(String username) {
-        Iterable<UserCheck> checks = getUserChecks(username, LocalDateTime.now().minusDays(6).toLocalDate());
-        return null;
+    public ExpensesDTO.Response.RequestedChecks getExpensesPerLastWeek(String username) {
+        List<UserCheck> checks = getUserChecks(username, LocalDateTime.now().minusDays(6));
+        return new ExpensesDTO.Response.RequestedChecks().setExpenses(checks);
     }
 
     @Override
-    public ExpensesDTO getExpensesForLastMonth(String username) {
-        Iterable<UserCheck> checks = getUserChecks(username, LocalDateTime.now().minusDays(30).toLocalDate());
-        return null;
+    public ExpensesDTO.Response.RequestedChecks getExpensesPerLastMonth(String username) {
+        Iterable<UserCheck> checks = getUserChecks(username, LocalDateTime.now().minusDays(30));
+        return new ExpensesDTO.Response.RequestedChecks().setExpenses(checks);
     }
 
     @Override
-    public ExpensesDTO getExpencesForLastYear(String username) {
-        Iterable<UserCheck> checks = getUserChecks(username, LocalDateTime.now().minusYears(1).toLocalDate());
-        return null;
+    public ExpensesDTO.Response.RequestedChecks getExpensesPerLastYear(String username) {
+        Iterable<UserCheck> checks = getUserChecks(username, LocalDateTime.now().minusYears(1));
+        return new ExpensesDTO.Response.RequestedChecks().setExpenses(checks);
     }
 
     @Override
-    public ExpensesDTO getExpencesForCustomPeriod(String username, LocalDateTime from, LocalDateTime to) {
-        return null;
+    public ExpensesDTO.Response.RequestedChecks getExpensesPerCustomPeriod(String username, LocalDateTime from, LocalDateTime to) {
+        long userDetailsId = userRepository
+                .findUserByUsername(username)
+                .orElseThrow()
+                .getUserDetails()
+                .getId();
+        List<UserCheck> checks = userCheckRepository.findAllByUserDetailsAndDateIn(userDetailsId, from, to);
+        return new ExpensesDTO.Response.RequestedChecks().setExpenses(checks);
     }
 }
