@@ -1,6 +1,7 @@
 package com.cashew.budgetservice.DAO.Entities;
 
 import com.cashew.budgetservice.DAO.CustomSerializers.UserSerializer;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -23,7 +24,8 @@ public class User {
     @CreatedDate
     private LocalDateTime date;
 
-    @OneToOne(cascade=CascadeType.PERSIST)
+    @OneToOne(cascade=CascadeType.ALL)
+    @JsonBackReference
     private UserDetails userDetails;
 }
 
