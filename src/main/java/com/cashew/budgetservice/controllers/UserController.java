@@ -1,6 +1,5 @@
 package com.cashew.budgetservice.controllers;
 
-import com.cashew.budgetservice.DAO.Interfaces.UsersDAO;
 import com.cashew.budgetservice.DTO.DTO;
 import com.cashew.budgetservice.DTO.UsersDTO;
 import com.cashew.budgetservice.services.UsersService;
@@ -12,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/users")
 public class UserController {
     private UsersService usersService;
-    @Autowired
-    private UsersDAO dao;
 
     @Autowired
     public UserController(UsersService usersService) {
@@ -44,7 +41,7 @@ public class UserController {
     public ResponseEntity<DTO> updateUser(
                         @PathVariable(value="id") Long id,
                         @RequestBody UsersDTO.Request.UpdateUser request){
-        return usersService.updateUser(request);
+        return usersService.updateUser(id, request.getUsername(), request.getEmail());
     }
 
     @DeleteMapping(path="/{id}")

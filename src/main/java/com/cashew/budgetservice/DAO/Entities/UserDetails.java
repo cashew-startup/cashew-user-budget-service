@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @EqualsAndHashCode
@@ -17,18 +17,19 @@ public class UserDetails {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
     private User user;
 
     @OneToMany(cascade=CascadeType.ALL)
     @JsonBackReference
-    private Set<UserCheck> userChecks;
+    private List<UserCheck> userChecks;
 
     @OneToMany
-    private Set<User> IncomingFriendRequests;
+    private List<User> IncomingFriendRequests;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    private Set<User> friends;
+    private List<User> friends;
 
     @ManyToMany(cascade=CascadeType.ALL)
-    private Set<Party> parties;
+    private List<Party> parties;
 }

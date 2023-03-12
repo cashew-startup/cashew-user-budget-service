@@ -16,8 +16,7 @@ public enum UsersDTO {;
         }
 
         @Data
-        public static class UpdateUser implements Id, Username, Email{
-            Long id;
+        public static class UpdateUser implements Username, Email{
             String username;
             String email;
         }
