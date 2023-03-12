@@ -31,25 +31,25 @@ public class ExpensesDAOImpl implements ExpensesDAO {
     @Override
     public ExpensesDTO.Response.RequestedChecks getExpensesPerLastDay(String username) {
         List<UserCheck> checks = getUserChecks(username, LocalDateTime.now().minusDays(1L));
-        return new ExpensesDTO.Response.RequestedChecks().setExpenses(checks);
+        return new ExpensesDTO.Response.RequestedChecks().setExpensesAsChecks(checks);
     }
 
     @Override
     public ExpensesDTO.Response.RequestedChecks getExpensesPerLastWeek(String username) {
         List<UserCheck> checks = getUserChecks(username, LocalDateTime.now().minusDays(6));
-        return new ExpensesDTO.Response.RequestedChecks().setExpenses(checks);
+        return new ExpensesDTO.Response.RequestedChecks().setExpensesAsChecks(checks);
     }
 
     @Override
     public ExpensesDTO.Response.RequestedChecks getExpensesPerLastMonth(String username) {
         Iterable<UserCheck> checks = getUserChecks(username, LocalDateTime.now().minusDays(30));
-        return new ExpensesDTO.Response.RequestedChecks().setExpenses(checks);
+        return new ExpensesDTO.Response.RequestedChecks().setExpensesAsChecks(checks);
     }
 
     @Override
     public ExpensesDTO.Response.RequestedChecks getExpensesPerLastYear(String username) {
         Iterable<UserCheck> checks = getUserChecks(username, LocalDateTime.now().minusYears(1));
-        return new ExpensesDTO.Response.RequestedChecks().setExpenses(checks);
+        return new ExpensesDTO.Response.RequestedChecks().setExpensesAsChecks(checks);
     }
 
     @Override
@@ -60,6 +60,6 @@ public class ExpensesDAOImpl implements ExpensesDAO {
                 .getUserDetails()
                 .getId();
         List<UserCheck> checks = userCheckRepository.findAllByUserDetailsAndDateIn(userDetailsId, from, to);
-        return new ExpensesDTO.Response.RequestedChecks().setExpenses(checks);
+        return new ExpensesDTO.Response.RequestedChecks().setExpensesAsChecks(checks);
     }
 }

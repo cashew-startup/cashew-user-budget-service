@@ -50,7 +50,7 @@ public enum ExpensesDTO {;
         public static class RequestedChecks extends DTO implements Expenses{
             List<Receipt> expenses;
 
-            public RequestedChecks setExpenses(Iterable<UserCheck> checks) {
+            public RequestedChecks setExpensesAsChecks(Iterable<UserCheck> checks) {
                 expenses = new ArrayList<>();
                 checks.forEach((check) -> {
                     expenses.add(check.getReceipt());

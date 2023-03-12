@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ public class User {
 
     @OneToOne(cascade=CascadeType.ALL)
     @JsonBackReference
+    @ToString.Exclude
     private UserDetails userDetails;
 }
 

@@ -1,6 +1,6 @@
 package com.cashew.budgetservice.DAO.Entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -13,11 +13,11 @@ public class UserCheck {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    @JsonBackReference
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JsonManagedReference
     private UserDetails userDetails;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Receipt receipt;
 
     private Boolean isDisabled = false;

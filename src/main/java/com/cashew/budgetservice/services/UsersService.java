@@ -65,9 +65,9 @@ public class UsersService {
         }
     }
 
-    public ResponseEntity<DTO> updateUser(UsersDTO.Request.UpdateUser request){
+    public ResponseEntity<DTO> updateUser(Long id, String username, String email){
         try {
-            User updatedUser = dao.updateUser(request.getId(), request.getUsername(), request.getEmail()).orElseThrow();
+            User updatedUser = dao.updateUser(id, username, email).orElseThrow();
             UsersDTO.Response.Updated response = new UsersDTO.Response.Updated(
                     updatedUser.getId(),
                     updatedUser.getUsername(),
