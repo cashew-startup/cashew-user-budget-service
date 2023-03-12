@@ -6,6 +6,7 @@ import com.cashew.budgetservice.DAO.Repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Component
@@ -14,7 +15,7 @@ public class FriendsDAOImpl implements FriendsDAO {
     private UserRepository userRepository;
 
     @Override
-    public Iterable<User> getFriends(String username) {
+    public List<User> getFriends(String username) {
         return userRepository
                 .findUserByUsername(username.toLowerCase().trim())
                 .orElseThrow()
@@ -23,7 +24,7 @@ public class FriendsDAOImpl implements FriendsDAO {
     }
 
     @Override
-    public Iterable<User> getFriendRequests(String username) {
+    public List<User> getFriendRequests(String username) {
         return userRepository
                 .findUserByUsername(username.toLowerCase().trim())
                 .orElseThrow()
@@ -32,25 +33,25 @@ public class FriendsDAOImpl implements FriendsDAO {
     }
 
     @Override
-    public void sendRequest(String senderUsername, String recipientUsername) {
+    public void sendRequest(String senderUsername, String receiverUsername) {
         User sender = userRepository
                 .findUserByUsername(senderUsername.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + senderUsername));
         User recipient = userRepository
-                .findUserByUsername(recipientUsername.toLowerCase().trim())
-                .orElseThrow(() -> new NoSuchElementException("No user with username " + recipientUsername));
+                .findUserByUsername(receiverUsername.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with username " + receiverUsername));
         recipient.getUserDetails().getIncomingFriendRequests().add(sender);
         userRepository.save(recipient);
     }
 
     @Override
-    public void acceptRequest(String senderUsername, String recipientUsername) {
+    public void acceptRequest(String senderUsername, String receiverUsername) {
         User sender = userRepository
                 .findUserByUsername(senderUsername.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + senderUsername));
         User recipient = userRepository
-                .findUserByUsername(recipientUsername.toLowerCase().trim())
-                .orElseThrow(() -> new NoSuchElementException("No user with username " + recipientUsername));
+                .findUserByUsername(receiverUsername.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with username " + receiverUsername));
         if (!recipient.getUserDetails().getIncomingFriendRequests().remove(sender)) {
             throw new NoSuchElementException("Such friend request was not found");
         }
@@ -62,13 +63,13 @@ public class FriendsDAOImpl implements FriendsDAO {
     }
 
     @Override
-    public void declineRequest(String senderUsername, String recipientUsername) {
+    public void declineRequest(String senderUsername, String receiverUsername) {
         User sender = userRepository
                 .findUserByUsername(senderUsername.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + senderUsername));
         User recipient = userRepository
-                .findUserByUsername(recipientUsername.toLowerCase().trim())
-                .orElseThrow(() -> new NoSuchElementException("No user with username " + recipientUsername));
+                .findUserByUsername(receiverUsername.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with username " + receiverUsername));
         if (!recipient.getUserDetails().getIncomingFriendRequests().remove(sender)) {
             throw new NoSuchElementException("Such friend request was not found");
         }
@@ -76,7 +77,7 @@ public class FriendsDAOImpl implements FriendsDAO {
     }
 
     @Override
-    public void deleteFromFriends(String username1, String username2) {
+    public void removeFromFriends(String username1, String username2) {
         User user1 = userRepository
                 .findUserByUsername(username1.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + username1));
@@ -85,7 +86,7 @@ public class FriendsDAOImpl implements FriendsDAO {
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + username2));
         if (!user1.getUserDetails().getFriends().remove(user2) ||
                 !user2.getUserDetails().getFriends().remove(user1)) {
-            throw new NoSuchElementException("Such friend was not found");
+            throw new NoSuchElementException("Such friend pair was not found");
         }
         userRepository.save(user1);
         userRepository.save(user2);
