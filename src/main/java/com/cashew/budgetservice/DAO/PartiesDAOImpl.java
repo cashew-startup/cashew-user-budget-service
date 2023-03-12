@@ -2,19 +2,20 @@ package com.cashew.budgetservice.DAO;
 
 import com.cashew.budgetservice.DAO.Entities.Party;
 import com.cashew.budgetservice.DAO.Entities.User;
-import com.cashew.budgetservice.DAO.Interfaces.PartyDAO;
+import com.cashew.budgetservice.DAO.Interfaces.PartiesDAO;
 import com.cashew.budgetservice.DAO.Repos.PartyRepository;
 import com.cashew.budgetservice.DAO.Repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Component
-public class PartyDAOImpl implements PartyDAO {
+public class PartiesDAOImpl implements PartiesDAO {
     @Autowired
     private PartyRepository partyRepository;
     @Autowired
@@ -28,8 +29,8 @@ public class PartyDAOImpl implements PartyDAO {
         p.setName(name);
         p.setDate(LocalDateTime.now());
         p.setOwnerId(ownerId);
-        p.setSetOfUserDetails(new HashSet<>());
-        p.getSetOfUserDetails().add(u.getUserDetails());
+        p.setListOfUserDetails(new ArrayList<>());
+        p.getListOfUserDetails().add(u.getUserDetails());
         partyRepository.save(p);
         u.getUserDetails()
                 .getParties()
@@ -44,48 +45,46 @@ public class PartyDAOImpl implements PartyDAO {
     }
 
     @Override
-    public Iterable<Party> getPartiesOfUser(Long userId){
+    public List<Party> getPartiesOfUser(String username){
         return userRepository
-                .findById(userId)
+                .findUserByUsername(username)
                 .orElseThrow()
                 .getUserDetails()
                 .getParties();
     }
 
     @Override
-    public Iterable<Party> getAllParties() {
-        return partyRepository.findAll();
-    }
-
-    @Override
-    public void addUserToParty(Long partyId, Long userId) {
+    public void addUserToParty(Long partyId, String username) {
         User u = userRepository
-                .findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("No user with such id"));
+                .findUserByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("No user with such username"));
         Party p = partyRepository
                 .findById(partyId)
                 .orElseThrow(() -> new NoSuchElementException("No party with such id"));
-        if (u.getUserDetails().getParties().add(p) == false
+        if (u.getUserDetails().getParties().contains(p)
             ||
-            p.getSetOfUserDetails().add(u.getUserDetails()) == false) {
+            p.getListOfUserDetails().contains(u.getUserDetails())) {
             throw new IllegalArgumentException("User is already in the party");
+        } else {
+            u.getUserDetails().getParties().add(p);
+            p.getListOfUserDetails().add(u.getUserDetails());
         }
         userRepository.save(u);
         partyRepository.save(p);
     }
 
     @Override
-    public void removeUserFromParty(Long partyId, Long userId) {
+    public void removeUserFromParty(Long partyId, String username) {
         Party p = partyRepository
                 .findById(partyId)
                 .orElseThrow(()->new IllegalArgumentException("No party with such id"));
         User u = userRepository
-                .findById(userId)
+                .findUserByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("No user with such id"));
-        if (userId.equals(p.getOwnerId())){
+        if (username.equals(userRepository.findById(p.getOwnerId()).get().getUsername())){
             throw new IllegalArgumentException("Can't remove owner from party");
         }
-        p.getSetOfUserDetails().remove(u.getUserDetails());
+        p.getListOfUserDetails().remove(u.getUserDetails());
         partyRepository.save(p);
     }
 
@@ -95,7 +94,7 @@ public class PartyDAOImpl implements PartyDAO {
         Party p = partyRepository
                 .findById(partyId)
                 .orElseThrow(() -> new IllegalArgumentException("No party with such id"));
-        p.getSetOfUserDetails().forEach((ud) -> ud.getParties().remove(p));
+        p.getListOfUserDetails().forEach((ud) -> ud.getParties().remove(p));
         partyRepository.deleteById(partyId);
     }
 }
