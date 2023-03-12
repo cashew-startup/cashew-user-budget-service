@@ -6,6 +6,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Entity
 @Data
 public class Price {
@@ -15,5 +17,5 @@ public class Price {
 
     private String name;
 
-    private Long amount;
+    private BigDecimal amount;
 }
