@@ -2,14 +2,14 @@ package com.cashew.budgetservice.DAO.Interfaces;
 
 import com.cashew.budgetservice.DAO.Entities.Party;
 
+import java.util.List;
 import java.util.Optional;
 
-public interface PartyDAO {
+public interface PartiesDAO {
     Long createParty(String name, Long ownerId);
     Optional<Party> getParty(Long id);
-    Iterable<Party> getPartiesOfUser(Long userId);
-    Iterable<Party> getAllParties();
-    void addUserToParty(Long partyId, Long userId);
-    void removeUserFromParty(Long partyId, Long userId);
+    List<Party> getPartiesOfUser(String username);
+    void addUserToParty(Long partyId, String username);
+    void removeUserFromParty(Long partyId, String username);
     void deleteParty(Long partyId);
 }
