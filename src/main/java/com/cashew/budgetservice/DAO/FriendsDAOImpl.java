@@ -51,7 +51,7 @@ public class FriendsDAOImpl implements FriendsDAO {
         User recipient = userRepository
                 .findUserByUsername(recipientUsername.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + recipientUsername));
-        if (recipient.getUserDetails().getIncomingFriendRequests().remove(sender) == false) {
+        if (!recipient.getUserDetails().getIncomingFriendRequests().remove(sender)) {
             throw new NoSuchElementException("Such friend request was not found");
         }
         sender.getUserDetails().getIncomingFriendRequests().remove(recipient);
@@ -69,7 +69,7 @@ public class FriendsDAOImpl implements FriendsDAO {
         User recipient = userRepository
                 .findUserByUsername(recipientUsername.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + recipientUsername));
-        if (recipient.getUserDetails().getIncomingFriendRequests().remove(sender) == false) {
+        if (!recipient.getUserDetails().getIncomingFriendRequests().remove(sender)) {
             throw new NoSuchElementException("Such friend request was not found");
         }
         userRepository.save(recipient);
@@ -83,8 +83,8 @@ public class FriendsDAOImpl implements FriendsDAO {
         User user2 = userRepository
                 .findUserByUsername(username2.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + username2));
-        if (user1.getUserDetails().getFriends().remove(user2) == false ||
-            user2.getUserDetails().getFriends().remove(user1) == false) {
+        if (!user1.getUserDetails().getFriends().remove(user2) ||
+                !user2.getUserDetails().getFriends().remove(user1)) {
             throw new NoSuchElementException("Such friend was not found");
         }
         userRepository.save(user1);

@@ -21,6 +21,4 @@ public interface UserCheckRepository extends CrudRepository<UserCheck,Long> {
             "and uc.userDetails.id = ?1 " +
             "and uc.isDisabled = false ")
     List<UserCheck> findAllByUserDetailsAndDateIn(Long userId, LocalDateTime from, LocalDateTime to);
-
-
 }
