@@ -1,75 +1,49 @@
 package com.cashew.budgetservice.controllers;
 
-import com.cashew.budgetservice.DAO.Interfaces.FriendsDAO;
-import com.cashew.budgetservice.DTO.StatusDTO;
+import com.cashew.budgetservice.DTO.DTO;
+import com.cashew.budgetservice.DTO.FriendsDTO;
+import com.cashew.budgetservice.services.FriendsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/v1/friends")
 public class FriendsController {
+    private FriendsService friendsService;
+
     @Autowired
-    private FriendsDAO dao;
-
-    @GetMapping(path = "/{username}")
-    public ResponseEntity<?> getFriends(@PathVariable(value = "username") String username){
-        try {
-            return new ResponseEntity(dao.getFriends(username), HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(new StatusDTO(404,"User not found").toJson(), HttpStatus.NOT_FOUND);
-        }
+    public FriendsController(FriendsService friendsService) {
+        this.friendsService = friendsService;
     }
 
-    @GetMapping(path = "/{username}/requests")
-    public ResponseEntity<?> getFriendRequests(@PathVariable(value = "username") String username){
-        try {
-            return new ResponseEntity(dao.getFriendRequests(username), HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(new StatusDTO(404,"User not found").toJson(), HttpStatus.NOT_FOUND);
-        }
+    @GetMapping
+    public ResponseEntity<DTO> getFriends(@RequestBody FriendsDTO.Request.Get request){
+        return friendsService.getFriends(request.getUsername());
     }
 
-    @PostMapping("/request/send")
-    public ResponseEntity<?> sendRequest(@RequestParam String sender, @RequestParam String recipient){
-        try {
-            dao.sendRequest(sender, recipient);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(new StatusDTO(404,e.getMessage()).toJson(), HttpStatus.NOT_FOUND);
-        }
+    @GetMapping(path = "/requests")
+    public ResponseEntity<DTO> getFriendRequests(@RequestBody FriendsDTO.Request.Get request){
+        return friendsService.getFriendRequests(request.getUsername());
+    }
+
+    @PostMapping("/requests/send")
+    public ResponseEntity<DTO> sendRequest(@RequestBody FriendsDTO.Request.FriendRequest request){
+        return friendsService.sendRequest(request.getSender(), request.getReceiver());
     }
 
     @PatchMapping("/request/accept")
-    public ResponseEntity<?> acceptRequest(@RequestParam String sender, @RequestParam String recipient){
-        try {
-            dao.acceptRequest(sender, recipient);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(new StatusDTO(404,e.getMessage()).toJson(), HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<DTO> acceptRequest(@RequestBody FriendsDTO.Request.FriendRequest request){
+        return friendsService.acceptRequest(request.getSender(), request.getReceiver());
     }
 
     @PatchMapping("/request/decline")
-    public ResponseEntity<?> declineRequest(@RequestParam String sender, @RequestParam String recipient){
-        try {
-            dao.declineRequest(sender, recipient);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(new StatusDTO(404,e.getMessage()).toJson(), HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<DTO> declineRequest(@RequestBody FriendsDTO.Request.FriendRequest request){
+        return friendsService.declineRequest(request.getSender(), request.getReceiver());
     }
 
     @DeleteMapping("/remove/")
-    public ResponseEntity<?> removeFromFriends(@RequestParam String deleter, @RequestParam String deleted){
-        try {
-            dao.deleteFromFriends(deleter, deleted);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(new StatusDTO(404,e.getMessage()).toJson(), HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<DTO> removeFromFriends(@RequestBody FriendsDTO.Request.RemoveFriend request){
+        return friendsService.removeFromFriends(request.getDeleter(), request.getDeleted());
     }
 }
