@@ -1,6 +1,7 @@
 package com.cashew.budgetservice.DTO;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public enum FriendsDTO {;
     private interface Deleter {String getDeleter();}
     private interface Deleted {String getDeleted();}
     private interface Friends {List<String> getFriends();}
+    private interface FriendRequests {List<String> getFriendRequests();}
 
 
     public enum Request{;
@@ -34,13 +36,19 @@ public enum FriendsDTO {;
     }
 
     public enum Response{;
+        @EqualsAndHashCode(callSuper = false)
         @Value
-        public static class GetFriends extends DTO implements Friends{
+        public static class GetFriends implements Friends{
             List<String> friends;
         }
 
         @Value
-        public static class Success extends DTO {
+        public static class GetFriendRequests implements FriendRequests{
+            List<String> friendRequests;
+        }
+
+        @Value
+        public static class Success{
             boolean success;
         }
     }

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @JsonSerialize(using = UserSerializer.class)
 @Data
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)

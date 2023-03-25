@@ -16,9 +16,15 @@ public enum UsersDTO {;
         }
 
         @Data
-        public static class UpdateUser implements Username, Email{
+        public static class UpdateUser implements Id, Username, Email{
+            Long id;
             String username;
             String email;
+        }
+
+        @Data
+        public static class GetById implements Id{
+            Long id;
         }
 
         @Data
@@ -39,22 +45,27 @@ public enum UsersDTO {;
 
     public enum Response{;
         @Value
-        public static class Created extends DTO implements Id{
+        public static class Created implements Id{
             Long id;
         }
 
         @Value
-        public static class Updated extends DTO implements Id, Username, Email{
+        public static class Updated implements Id, Username, Email{
             Long id;
             String username;
             String email;
         }
 
         @Value
-        public static class Found extends DTO implements Id, Username, Email{
+        public static class Found implements Id, Username, Email{
             Long id;
             String username;
             String email;
+        }
+
+        @Value
+        public static class Deleted {
+            boolean success;
         }
     }
 }

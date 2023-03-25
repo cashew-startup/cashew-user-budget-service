@@ -1,81 +1,106 @@
 package com.cashew.budgetservice.services;
 
-import com.cashew.budgetservice.DAO.Interfaces.FriendsDAO;
-import com.cashew.budgetservice.DTO.DTO;
+import com.cashew.budgetservice.DAO.Entities.User;
+import com.cashew.budgetservice.DAO.Repos.UserRepository;
 import com.cashew.budgetservice.DTO.FriendsDTO;
-import com.cashew.budgetservice.DTO.StatusDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@Service
-public class FriendsService {
-    private FriendsDAO dao;
-
+@Component
+public class FriendsService{
     @Autowired
-    public FriendsService(FriendsDAO dao) {
-        this.dao = dao;
+    private UserRepository userRepository;
+
+    public ResponseEntity<FriendsDTO.Response.GetFriends> getFriends(String username) {
+        List<User> friends = userRepository
+                .findTopByUsername(username.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("User not found"))
+                .getUserDetails()
+                .getFriends();
+        List<String> usernames = new ArrayList<>();
+        friends.forEach((user)-> usernames.add(user.getUsername()));
+        return new ResponseEntity<>(new FriendsDTO.Response.GetFriends(usernames), HttpStatus.OK);
     }
 
-
-    public ResponseEntity<DTO> getFriends(String username) {
-        try {
-            List<String> usernames = new ArrayList<>();
-            dao.getFriends(username).forEach((user)-> usernames.add(user.getUsername()));
-            return new ResponseEntity<>(new FriendsDTO.Response.GetFriends(usernames), HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(new StatusDTO(404,"User not found"), HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<FriendsDTO.Response.GetFriendRequests> getFriendRequests(String username) {
+        List<User> friendRequests = userRepository
+                .findTopByUsername(username.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("User not found"))
+                .getUserDetails()
+                .getIncomingFriendRequests();
+        List<String> usernames = new ArrayList<>();
+        friendRequests.forEach((user)-> usernames.add(user.getUsername()));
+        return new ResponseEntity<>(new FriendsDTO.Response.GetFriendRequests(usernames), HttpStatus.OK);
     }
 
-    public ResponseEntity<DTO> getFriendRequests(String username) {
-        try {
-            List<String> usernames = new ArrayList<>();
-            dao.getFriendRequests(username).forEach((user)-> usernames.add(user.getUsername()));
-            return new ResponseEntity<>(new FriendsDTO.Response.GetFriends(usernames), HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(new StatusDTO(404,"User not found"), HttpStatus.NOT_FOUND);
-        }
+    @Transactional
+    public ResponseEntity<FriendsDTO.Response.Success> sendRequest(String senderUsername, String receiverUsername) {
+        User sender = userRepository
+                .findTopByUsername(senderUsername.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with username " + senderUsername));
+        User receiver = userRepository
+                .findTopByUsername(receiverUsername.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with username " + receiverUsername));
+        receiver.getUserDetails().getIncomingFriendRequests().add(sender);
+        userRepository.save(receiver);
+        return new ResponseEntity<>(new FriendsDTO.Response.Success(true),HttpStatus.OK);
     }
 
-    public ResponseEntity<DTO> sendRequest(String sender, String receiver) {
-        try {
-            dao.sendRequest(sender, receiver);
-            return new ResponseEntity<>(new FriendsDTO.Response.Success(true),HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(new StatusDTO(404,e.getMessage()), HttpStatus.NOT_FOUND);
+    @Transactional
+    public ResponseEntity<FriendsDTO.Response.Success> acceptRequest(String senderUsername, String receiverUsername) {
+        User sender = userRepository
+                .findTopByUsername(senderUsername.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with username " + senderUsername));
+        User recipient = userRepository
+                .findTopByUsername(receiverUsername.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with username " + receiverUsername));
+        if (!recipient.getUserDetails().getIncomingFriendRequests().remove(sender)) {
+            throw new NoSuchElementException("Such friend request was not found");
         }
+        sender.getUserDetails().getIncomingFriendRequests().remove(recipient);
+        sender.getUserDetails().getFriends().add(recipient);
+        recipient.getUserDetails().getFriends().add(sender);
+        userRepository.save(sender);
+        userRepository.save(recipient);
+        return new ResponseEntity<>(new FriendsDTO.Response.Success(true),HttpStatus.OK);
     }
 
-    public ResponseEntity<DTO> acceptRequest(String sender, String receiver) {
-        try {
-            dao.acceptRequest(sender, receiver);
-            return new ResponseEntity<>(new FriendsDTO.Response.Success(true), HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(new StatusDTO(404,e.getMessage()), HttpStatus.NOT_FOUND);
+    @Transactional
+    public ResponseEntity<FriendsDTO.Response.Success> declineRequest(String senderUsername, String receiverUsername) {
+        User sender = userRepository
+                .findTopByUsername(senderUsername.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with username " + senderUsername));
+        User recipient = userRepository
+                .findTopByUsername(receiverUsername.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with username " + receiverUsername));
+        if (!recipient.getUserDetails().getIncomingFriendRequests().remove(sender)) {
+            throw new NoSuchElementException("Such friend request was not found");
         }
+        userRepository.save(recipient);
+        return new ResponseEntity<>(new FriendsDTO.Response.Success(true), HttpStatus.OK);
     }
 
-    public ResponseEntity<DTO> declineRequest(String sender, String receiver) {
-        try {
-            dao.declineRequest(sender, receiver);
-            return new ResponseEntity<>(new FriendsDTO.Response.Success(true), HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(new StatusDTO(404,e.getMessage()), HttpStatus.NOT_FOUND);
+    @Transactional
+    public ResponseEntity<FriendsDTO.Response.Success> removeFromFriends(String username1, String username2) {
+        User user1 = userRepository
+                .findTopByUsername(username1.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with username " + username1));
+        User user2 = userRepository
+                .findTopByUsername(username2.toLowerCase().trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with username " + username2));
+        if (!user1.getUserDetails().getFriends().remove(user2) ||
+                !user2.getUserDetails().getFriends().remove(user1)) {
+            throw new NoSuchElementException("Such friend pair was not found");
         }
-    }
-
-    public ResponseEntity<DTO> removeFromFriends(String deleter, String deleted) {
-        try {
-            dao.removeFromFriends(deleter, deleted);
-            return new ResponseEntity<>(new FriendsDTO.Response.Success(true), HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(new StatusDTO(404,e.getMessage()), HttpStatus.NOT_FOUND);
-        }
+        userRepository.save(user1);
+        userRepository.save(user2);
+        return new ResponseEntity<>(new FriendsDTO.Response.Success(true), HttpStatus.OK);
     }
 }

@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public class StatusDTO extends DTO{
+public class StatusDTO{
     @NonNull int code;
     @NonNull String description;
 }

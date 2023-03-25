@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Fetch;
 
 import java.util.List;
 
@@ -16,20 +17,36 @@ public class UserDetails {
     @GeneratedValue
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @EqualsAndHashCode.Exclude
     private User user;
 
-    @OneToMany(cascade=CascadeType.ALL)
+    @OneToMany
     @JsonBackReference
     private List<UserCheck> userChecks;
 
-    @OneToMany
-    private List<User> IncomingFriendRequests;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany
+    @JoinTable(
+            name = "user_details_incoming_friend_requests",
+            joinColumns = @JoinColumn(name = "user_details_id"),
+            inverseJoinColumns = @JoinColumn(name = "incoming_friend_request_user_id")
+    )
+    private List<User> incomingFriendRequests;
+
+    @OneToMany
+    @JoinTable(
+            name = "user_details_friends",
+            joinColumns = @JoinColumn(name = "user_details_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_user_id")
+    )
     private List<User> friends;
 
-    @ManyToMany(cascade=CascadeType.ALL)
+    @ManyToMany
+    @JoinTable(
+            name = "user_details_parties",
+            joinColumns = @JoinColumn(name = "user_details_id"),
+            inverseJoinColumns = @JoinColumn(name = "party_id")
+    )
     private List<Party> parties;
 }

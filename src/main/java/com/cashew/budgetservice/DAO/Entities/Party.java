@@ -22,9 +22,9 @@ public class Party {
 
     private Long ownerId;
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "parties")
+    @ManyToMany(mappedBy = "parties")
     @ToString.Exclude
-    private List<UserDetails> ListOfUserDetails;
+    private List<UserDetails> listOfUserDetails;
 
     @CreatedDate
     private LocalDateTime date;

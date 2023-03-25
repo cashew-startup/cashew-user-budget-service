@@ -1,8 +1,7 @@
 package com.cashew.budgetservice.controllers;
 
-import com.cashew.budgetservice.DTO.DTO;
-import com.cashew.budgetservice.DTO.UsersDTO;
 import com.cashew.budgetservice.services.UsersService;
+import com.cashew.budgetservice.DTO.UsersDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,36 +16,34 @@ public class UserController {
         this.usersService = usersService;
     }
 
-    @PostMapping(path="/add")
-    public ResponseEntity<DTO> createNewUser (@RequestBody UsersDTO.Request.Create request) {
+    @PostMapping
+    public ResponseEntity<UsersDTO.Response.Created> createNewUser (@RequestBody UsersDTO.Request.Create request) {
         return usersService.createUser(request.getUsername(), request.getEmail());
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<DTO> getUserById(@PathVariable(value = "id") Long id){
-        return usersService.getUserById(id);
+    @GetMapping
+    public ResponseEntity<UsersDTO.Response.Found> getUserById(@RequestBody UsersDTO.Request.GetById request){
+        return usersService.getUserById(request.getId());
     }
 
     @GetMapping(path = "/byUsername")
-    public ResponseEntity<?> getUserByUsername(@RequestBody UsersDTO.Request.GetByUsername request){
+    public ResponseEntity<UsersDTO.Response.Found> getUserByUsername(@RequestBody UsersDTO.Request.GetByUsername request){
         return  usersService.getUserByUsername(request.getUsername());
     }
 
     @GetMapping("/byEmail")
-    public ResponseEntity<DTO> getUserByEmail(@RequestBody UsersDTO.Request.GetByEmail request){
+    public ResponseEntity<UsersDTO.Response.Found> getUserByEmail(@RequestBody UsersDTO.Request.GetByEmail request){
         return  usersService.getUserByEmail(request.getEmail());
     }
 
-    @PutMapping(path="/{id}")
-    public ResponseEntity<DTO> updateUser(
-                        @PathVariable(value="id") Long id,
-                        @RequestBody UsersDTO.Request.UpdateUser request){
-        return usersService.updateUser(id, request.getUsername(), request.getEmail());
+    @PutMapping
+    public ResponseEntity<UsersDTO.Response.Updated> updateUser(@RequestBody UsersDTO.Request.UpdateUser request){
+        return usersService.updateUser(request.getId(), request.getUsername(), request.getEmail());
     }
 
-    @DeleteMapping(path="/{id}")
-    public ResponseEntity<DTO> deleteUserById (@PathVariable(value = "id") Long id) {
-        return usersService.deleteUserById(id);
+    @DeleteMapping
+    public ResponseEntity<UsersDTO.Response.Deleted> deleteUserById (@RequestBody UsersDTO.Request.Delete request) {
+        return usersService.deleteUserById(request.getId());
     }
 
 }

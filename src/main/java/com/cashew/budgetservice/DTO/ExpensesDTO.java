@@ -47,14 +47,12 @@ public enum ExpensesDTO {;
 
     public enum Response{;
         @Data
-        public static class RequestedChecks extends DTO implements Expenses{
+        public static class RequestedChecks implements Expenses{
             List<Receipt> expenses;
 
             public RequestedChecks setExpensesAsChecks(Iterable<UserCheck> checks) {
                 expenses = new ArrayList<>();
-                checks.forEach((check) -> {
-                    expenses.add(check.getReceipt());
-                });
+                checks.forEach((check) -> expenses.add(check.getReceipt()));
                 return this;
             }
         }

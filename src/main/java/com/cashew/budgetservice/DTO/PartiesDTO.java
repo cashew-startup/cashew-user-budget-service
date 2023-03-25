@@ -29,41 +29,57 @@ public enum PartiesDTO {;
 
         @Data
         public static class AddUserToParty implements PartyId,Username{
-            Long PartyId;
+            Long partyId;
             String username;
         }
 
         @Data
         public static class RemoveUserFromParty implements PartyId,Username{
-            Long PartyId;
+            Long partyId;
             String username;
+        }
+
+        @Data
+        public static class GetFullInfo implements PartyId{
+            Long partyId;
+        }
+
+        @Data
+        public static class Delete implements PartyId{
+            Long partyId;
+        }
+
+        @Data
+        public static class ChangeName implements PartyId, Name{
+            Long partyId;
+            String name;
         }
 
     }
 
     public enum Response{;
         @Value
-        public static class Created extends DTO implements PartyId {
-            Long PartyId;
+        public static class Created implements PartyId {
+            Long partyId;
         }
 
         @Value
-        public static class UsersList extends DTO implements Users{
+        public static class UsersList implements Users{
             List<String> users;
         }
 
         @Value
-        public static class PartiesList extends DTO implements Parties{
+        public static class PartiesList implements Parties{
             List<Party> parties;
         }
 
         @Value
-        public static class FullInfo extends DTO implements PartiesDTO.FullInfo {
+        public static class FullInfo implements PartiesDTO.FullInfo {
             Party party;
         }
 
         @Value
-        public static class Success extends DTO {
+        public static class Success {
             Boolean success;
         }
     }

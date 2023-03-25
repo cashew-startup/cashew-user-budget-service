@@ -1,6 +1,5 @@
 package com.cashew.budgetservice.controllers;
 
-import com.cashew.budgetservice.DTO.DTO;
 import com.cashew.budgetservice.DTO.FriendsDTO;
 import com.cashew.budgetservice.services.FriendsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,32 +17,32 @@ public class FriendsController {
     }
 
     @GetMapping
-    public ResponseEntity<DTO> getFriends(@RequestBody FriendsDTO.Request.Get request){
+    public ResponseEntity<FriendsDTO.Response.GetFriends> getFriends(@RequestBody FriendsDTO.Request.Get request){
         return friendsService.getFriends(request.getUsername());
     }
 
     @GetMapping(path = "/requests")
-    public ResponseEntity<DTO> getFriendRequests(@RequestBody FriendsDTO.Request.Get request){
+    public ResponseEntity<FriendsDTO.Response.GetFriendRequests> getFriendRequests(@RequestBody FriendsDTO.Request.Get request){
         return friendsService.getFriendRequests(request.getUsername());
     }
 
     @PostMapping("/requests/send")
-    public ResponseEntity<DTO> sendRequest(@RequestBody FriendsDTO.Request.FriendRequest request){
+    public ResponseEntity<FriendsDTO.Response.Success> sendRequest(@RequestBody FriendsDTO.Request.FriendRequest request){
         return friendsService.sendRequest(request.getSender(), request.getReceiver());
     }
 
-    @PatchMapping("/request/accept")
-    public ResponseEntity<DTO> acceptRequest(@RequestBody FriendsDTO.Request.FriendRequest request){
+    @PatchMapping("/requests/accept")
+    public ResponseEntity<FriendsDTO.Response.Success> acceptRequest(@RequestBody FriendsDTO.Request.FriendRequest request){
         return friendsService.acceptRequest(request.getSender(), request.getReceiver());
     }
 
-    @PatchMapping("/request/decline")
-    public ResponseEntity<DTO> declineRequest(@RequestBody FriendsDTO.Request.FriendRequest request){
+    @PatchMapping("/requests/decline")
+    public ResponseEntity<FriendsDTO.Response.Success> declineRequest(@RequestBody FriendsDTO.Request.FriendRequest request){
         return friendsService.declineRequest(request.getSender(), request.getReceiver());
     }
 
-    @DeleteMapping("/remove/")
-    public ResponseEntity<DTO> removeFromFriends(@RequestBody FriendsDTO.Request.RemoveFriend request){
+    @DeleteMapping
+    public ResponseEntity<FriendsDTO.Response.Success> removeFromFriends(@RequestBody FriendsDTO.Request.RemoveFriend request){
         return friendsService.removeFromFriends(request.getDeleter(), request.getDeleted());
     }
 }
