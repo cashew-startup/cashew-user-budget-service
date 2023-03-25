@@ -4,12 +4,8 @@ import com.cashew.budgetservice.DTO.ExpensesDTO;
 import com.cashew.budgetservice.DTO.ExpensesDTO.Request;
 import com.cashew.budgetservice.services.ExpensesService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/expenses")
@@ -19,6 +15,11 @@ public class ExpensesController {
     @Autowired
     public ExpensesController(ExpensesService expensesService) {
         this.expensesService = expensesService;
+    }
+
+    @PostMapping
+    public ResponseEntity<ExpensesDTO.Response.Success> addReceipt(@RequestBody ExpensesDTO.Request.AddReceipt request){
+        return expensesService.addReceipt(request.getUsername(), request.getToken());
     }
 
     @GetMapping(path = "/day")
@@ -43,7 +44,6 @@ public class ExpensesController {
 
     @GetMapping(path = "/period")
     public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerCustomPeriod(@RequestBody
-                                                            @DateTimeFormat(pattern = "dd.MM.yyyy")
                                                                     Request.perCustomPeriod requestDTO){
         return expensesService.getExpensesPerCustomPeriod(requestDTO.getUsername(), requestDTO.getFrom(), requestDTO.getTo());
     }

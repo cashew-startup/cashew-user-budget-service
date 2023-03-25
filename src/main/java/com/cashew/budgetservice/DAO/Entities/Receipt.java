@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.CreatedDate;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,10 +18,20 @@ public class Receipt {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
+    private String company;
+    private String address;
+    private String INN;
+    private String date;
+    private String receiptNumber;
+    private String shift;
+    private String cashier;
+    private BigDecimal total;
+    private BigDecimal cash;
+    private BigDecimal card;
+    private BigDecimal VAT20;
+    private BigDecimal VAT10;
+    private String taxation;
+
     @OneToMany(cascade = CascadeType.ALL)
     private List<Product> products;
-
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone="GMT")
-    @CreatedDate
-    private LocalDateTime date;
 }

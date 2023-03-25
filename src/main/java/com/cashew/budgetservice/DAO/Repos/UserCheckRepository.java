@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface UserCheckRepository extends CrudRepository<UserCheck,Long> {
@@ -20,5 +21,5 @@ public interface UserCheckRepository extends CrudRepository<UserCheck,Long> {
             "where r.date between ?2 and ?3 " +
             "and uc.userDetails.id = ?1 " +
             "and uc.isDisabled = false ")
-    List<UserCheck> findAllByUserDetailsAndDateIn(Long userId, LocalDateTime from, LocalDateTime to);
+    List<UserCheck> findAllByUserDetailsAndDateIn(Long userId, ZonedDateTime from, ZonedDateTime to);
 }

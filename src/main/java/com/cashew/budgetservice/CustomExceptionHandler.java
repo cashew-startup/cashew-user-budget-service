@@ -1,6 +1,7 @@
 package com.cashew.budgetservice;
 
 import com.cashew.budgetservice.DTO.StatusDTO;
+import com.cashew.budgetservice.exceptions.FetchDataException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +27,12 @@ public class CustomExceptionHandler {
     public ResponseEntity<StatusDTO> handle(IllegalArgumentException ex){
         log.error(ex.getMessage(), ex);
         return new ResponseEntity<>(new StatusDTO(409, ex.getMessage()), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ResponseEntity<StatusDTO> handle(FetchDataException ex){
+        log.error(ex.getMessage(), ex);
+        return new ResponseEntity<>(new StatusDTO(503, ex.getMessage()), HttpStatus.SERVICE_UNAVAILABLE);
     }
 }

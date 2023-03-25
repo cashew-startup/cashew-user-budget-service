@@ -24,8 +24,4 @@ public class Product {
 
     @OneToOne(cascade = CascadeType.ALL)
     private Price price;
-
-    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone="GMT")
-    @CreatedDate
-    private LocalDateTime date;
 }
