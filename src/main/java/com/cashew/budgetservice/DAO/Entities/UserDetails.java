@@ -1,35 +1,52 @@
 package com.cashew.budgetservice.DAO.Entities;
 
-import com.cashew.budgetservice.DAO.CustomSerializers.UserDetailsSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Fetch;
 
 import java.util.List;
 
 @Entity
-@JsonSerialize(using = UserDetailsSerializer.class)
+@EqualsAndHashCode
+@Data
 public class UserDetails {
 
     @Id
     @GeneratedValue
-    @Getter
-    @Setter
     private Long id;
 
-    @OneToOne(cascade=CascadeType.ALL)
-    @Getter
-    @Setter
+    @OneToOne
+    @EqualsAndHashCode.Exclude
     private User user;
 
-    @OneToMany(cascade=CascadeType.ALL)
-    @Getter
-    @Setter
+    @OneToMany
+    @JsonBackReference
     private List<UserCheck> userChecks;
 
-    @ManyToMany(cascade=CascadeType.ALL)
-    @Getter
-    @Setter
+
+    @OneToMany
+    @JoinTable(
+            name = "user_details_incoming_friend_requests",
+            joinColumns = @JoinColumn(name = "user_details_id"),
+            inverseJoinColumns = @JoinColumn(name = "incoming_friend_request_user_id")
+    )
+    private List<User> incomingFriendRequests;
+
+    @OneToMany
+    @JoinTable(
+            name = "user_details_friends",
+            joinColumns = @JoinColumn(name = "user_details_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_user_id")
+    )
+    private List<User> friends;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_details_parties",
+            joinColumns = @JoinColumn(name = "user_details_id"),
+            inverseJoinColumns = @JoinColumn(name = "party_id")
+    )
     private List<Party> parties;
 }

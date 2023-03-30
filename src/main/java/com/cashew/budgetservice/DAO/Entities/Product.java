@@ -1,33 +1,37 @@
 package com.cashew.budgetservice.DAO.Entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
+@Data
+@Accessors(chain = true)
 public class Product {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    @Getter
-    @Setter
+    @JsonIgnore
     private Long id;
 
-    @Getter
-    @Setter
     private String name;
 
-    @Getter
-    @Setter
     private String description;
 
-    @OneToOne(cascade=CascadeType.ALL)
-    @Getter
-    @Setter
-    private Price price;
+    private String currency;
 
-    @Getter
-    @Setter
-    private LocalDate date;
+    private BigDecimal pricePerUnit;
+
+    private Double quantity;
+
+    private BigDecimal totalPrice;
+
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone="GMT")
+    @CreatedDate
+    private LocalDateTime date;
 }

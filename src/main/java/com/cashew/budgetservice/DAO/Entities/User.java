@@ -1,39 +1,34 @@
 package com.cashew.budgetservice.DAO.Entities;
 
 import com.cashew.budgetservice.DAO.CustomSerializers.UserSerializer;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @JsonSerialize(using = UserSerializer.class)
+@Data
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    @Getter
-    @Setter
     private Long id;
 
-    @Getter
-    @Setter
     private String username;
 
-    @Getter
-    @Setter
     private String email;
 
     @CreatedDate
-    @Getter
-    @Setter
-    private LocalDate date;
+    private LocalDateTime date;
 
     @OneToOne(cascade=CascadeType.ALL)
-    @Getter
-    @Setter
+    @JsonBackReference
+    @ToString.Exclude
     private UserDetails userDetails;
 }
 
