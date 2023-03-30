@@ -12,6 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -42,17 +43,17 @@ public class FetchReceiptService {
     }
 
     public Receipt fetchReceipt(String username, String token) {
-        String url = "http://" + receiptServiceIpAndPort + "/receipt";
-        log.error(url);
-        HttpEntity<ExpensesDTO.Request.Fetch> request = new HttpEntity<>(new ExpensesDTO.Request.Fetch(username, token));
-        ResponseEntity<FetchedReceiptInfo> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                request,
-                FetchedReceiptInfo.class);
-        if (response.getStatusCode() == HttpStatus.OK) {
+        try {
+            String url = "http://" + receiptServiceIpAndPort + "/receipt";
+            HttpEntity<ExpensesDTO.Request.Fetch> request = new HttpEntity<>(new ExpensesDTO.Request.Fetch(username, token));
+            ResponseEntity<FetchedReceiptInfo> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    request,
+                    FetchedReceiptInfo.class);
             return response.getBody().prepareReceipt();
-        } else {
+        } catch (HttpMessageConversionException e) {
+            log.error("Failed to fetch receipt from receipt service", e);
             throw new FetchDataException("Failed to fetch receipt from receipt service");
         }
     }

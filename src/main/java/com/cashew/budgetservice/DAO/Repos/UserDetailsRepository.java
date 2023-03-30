@@ -22,4 +22,9 @@ public interface UserDetailsRepository extends CrudRepository<UserDetails, Long>
     @Query(nativeQuery = true, value = "DELETE FROM user_details_parties " +
             "where user_details_id = ?1 ")
     void deleteUserDetailsFromAllParties(Long id);
+
+    @Modifying
+    @Query(nativeQuery = true, value = "DELETE FROM user_check " +
+            "where user_details_id = ?1 ")
+    void deleteAllUserChecksOfUserDetails(Long id);
 }
