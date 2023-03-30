@@ -58,7 +58,9 @@ public enum ExpensesDTO {;
         @Data
         public static class perCustomPeriod implements Username {
             String username;
+            @JsonFormat(pattern = "yyyy-MM-dd")
             String from;
+            @JsonFormat(pattern = "yyyy-MM-dd")
             String to;
         }
     }

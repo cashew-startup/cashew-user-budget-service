@@ -97,6 +97,7 @@ public class UsersService {
         userDetailsRepository.deleteFriendRequestsByUserDetailsId(id);
         userDetailsRepository.deleteFriendsByUserDetailsId(id);
         userDetailsRepository.deleteUserDetailsFromAllParties(id);
+        userDetailsRepository.deleteAllUserChecksOfUserDetails(id);
         userDetailsRepository.save(userDetails);
         userDetailsRepository.delete(userDetails);
         userRepository.deleteById(id);
