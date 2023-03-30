@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.CreatedDate;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,6 +23,15 @@ public class Product {
 
     private String description;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private Price price;
+    private String currency;
+
+    private BigDecimal pricePerUnit;
+
+    private Double quantity;
+
+    private BigDecimal totalPrice;
+
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone="GMT")
+    @CreatedDate
+    private LocalDateTime date;
 }

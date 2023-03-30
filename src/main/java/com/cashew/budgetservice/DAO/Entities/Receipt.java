@@ -8,6 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Entity
@@ -21,7 +22,7 @@ public class Receipt {
     private String company;
     private String address;
     private String INN;
-    private String date;
+    private ZonedDateTime date;
     private String receiptNumber;
     private String shift;
     private String cashier;
