@@ -6,6 +6,7 @@ import com.cashew.budgetservice.DAO.Repos.ReceiptRepository;
 import com.cashew.budgetservice.DTO.ExpensesDTO;
 import com.cashew.budgetservice.exceptions.FetchDataException;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -23,11 +24,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class FetchReceiptService {
     private ReceiptRepository receiptRepository;
     private ProductRepository productRepository;
     private RestTemplate restTemplate;
-    private String receiptServiceUrl;
+    private String receiptServiceIpAndPort;
 
     @Autowired
     public FetchReceiptService(ReceiptRepository receiptRepository,
@@ -36,11 +38,12 @@ public class FetchReceiptService {
         this.receiptRepository = receiptRepository;
         this.productRepository = productRepository;
         this.restTemplate = restTemplate;
-        this.receiptServiceUrl = System.getenv("RECEIPT_SERVICE_URL");
+        this.receiptServiceIpAndPort = System.getenv("RECEIPT_SERVICE_IP_AND_PORT");
     }
 
     public Receipt fetchReceipt(String username, String token) {
-        String url = receiptServiceUrl + "/receipt";
+        String url = "http://" + receiptServiceIpAndPort + "/receipt";
+        log.error(url);
         HttpEntity<ExpensesDTO.Request.Fetch> request = new HttpEntity<>(new ExpensesDTO.Request.Fetch(username, token));
         ResponseEntity<FetchedReceiptInfo> response = restTemplate.exchange(
                 url,
@@ -48,8 +51,7 @@ public class FetchReceiptService {
                 request,
                 FetchedReceiptInfo.class);
         if (response.getStatusCode() == HttpStatus.OK) {
-            Receipt receipt = response.getBody().prepareReceipt();
-            return receipt;
+            return response.getBody().prepareReceipt();
         } else {
             throw new FetchDataException("Failed to fetch receipt from receipt service");
         }

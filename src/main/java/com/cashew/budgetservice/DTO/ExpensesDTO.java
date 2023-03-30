@@ -5,6 +5,7 @@ import com.cashew.budgetservice.DAO.Entities.UserCheck;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Value;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -74,14 +75,14 @@ public enum ExpensesDTO {;
             }
         }
 
-        @Data
+        @Value
         public static class FetchedReceiptInfo implements Username, Date, FetchedReceipt{
-            private String username;
-            private String date;
-            private Receipt fetchedReceipt;
+            String username;
+            String date;
+            Receipt fetchedReceipt;
         }
 
-        @Data
+        @Value
         public static class Success {
             boolean success;
         }
