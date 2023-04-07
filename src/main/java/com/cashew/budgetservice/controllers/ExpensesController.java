@@ -23,28 +23,29 @@ public class ExpensesController {
     }
 
     @GetMapping(path = "/day")
-    public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesForToday(@RequestBody Request.perLastDay requestDTO){
-        return expensesService.getExpensesPerLastDay(requestDTO.getUsername());
+    public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerDay(@RequestParam String username){
+        return expensesService.getExpensesPerLastDay(username);
     }
 
     @GetMapping(path = "/week")
-    public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerWeek(@RequestBody Request.perLastWeek requestDTO){
-        return expensesService.getExpensesPerLastWeek(requestDTO.getUsername());
+    public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerWeek(@RequestParam String username){
+        return expensesService.getExpensesPerLastWeek(username);
     }
 
     @GetMapping(path = "/month")
-    public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerMonth(@RequestBody Request.perLastMonth requestDTO){
-        return expensesService.getExpensesPerLastMonth(requestDTO.getUsername());
+    public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerMonth(@RequestParam String username){
+        return expensesService.getExpensesPerLastMonth(username);
     }
 
     @GetMapping(path = "/year")
-    public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerYear(@RequestBody Request.perLastYear requestDTO){
-        return expensesService.getExpensesPerLastYear(requestDTO.getUsername());
+    public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerYear(@RequestParam String username){
+        return expensesService.getExpensesPerLastYear(username);
     }
 
     @GetMapping(path = "/period")
-    public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerCustomPeriod(@RequestBody
-                                                                    Request.perCustomPeriod requestDTO){
-        return expensesService.getExpensesPerCustomPeriod(requestDTO.getUsername(), requestDTO.getFrom(), requestDTO.getTo());
+    public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerCustomPeriod(@RequestParam String username,
+                                                                                           @RequestParam String from,
+                                                                                           @RequestParam String to){
+        return expensesService.getExpensesPerCustomPeriod(username, from, to);
     }
 }

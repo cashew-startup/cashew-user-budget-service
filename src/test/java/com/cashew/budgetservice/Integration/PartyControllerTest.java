@@ -208,10 +208,7 @@ public class PartyControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/parties/of")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": ""
-                                }"""))
+                        .param("username", ""))
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -225,10 +222,7 @@ public class PartyControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/parties/of")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "%s"
-                                }""".formatted(ownerUsername)))
+                        .param("username", ownerUsername))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -236,10 +230,7 @@ public class PartyControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/parties/of")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "%s"
-                                }""".formatted(guest1Username)))
+                        .param("username", guest1Username))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),

@@ -25,7 +25,7 @@ class UserControllerTest {
     private MockMvc mockMvc;
     private UsersService usersService;
 
-    private int testUserId;
+    private Integer testUserId;
 
     @Autowired
     public UserControllerTest(UsersService usersService, MockMvc mockMvc) {
@@ -89,11 +89,7 @@ class UserControllerTest {
         ResultActions response = this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/users/byUsername")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }
-                                """));
+                        .param("username", "TestUser1"));
         response.andExpectAll(
                 status().isOk(),
                 content().contentType(MediaType.APPLICATION_JSON),
@@ -105,11 +101,7 @@ class UserControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/users/byUsername")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "RandomUsernameBebra123"
-                                }
-                                """))
+                        .param("username", "RandomUsername123"))
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -118,11 +110,7 @@ class UserControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/users/byEmail")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "email": "example@yahoo.com"
-                                }
-                                """))
+                        .param("email", "example@yahoo.com"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -133,11 +121,7 @@ class UserControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/users/byEmail")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "email": "RandomEmailBebra123"
-                                }
-                                """))
+                        .param("email", "RandomEmail123"))
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -146,11 +130,7 @@ class UserControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "id": %s
-                                }
-                                """.formatted(testUserId)))
+                        .param("id", testUserId.toString()))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -161,11 +141,7 @@ class UserControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "id": 0
-                                }
-                                """))
+                        .param("id", "0"))
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -195,11 +171,7 @@ class UserControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "id": %s
-                                }
-                                """.formatted(testUserId)))
+                        .param("id", testUserId.toString()))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -227,11 +199,7 @@ class UserControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "id": %s
-                                }
-                                """.formatted(testUserId)))
+                        .param("id", testUserId.toString()))
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),

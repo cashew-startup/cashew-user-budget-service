@@ -27,8 +27,8 @@ public class PartyController {
     }
 
     @GetMapping(path = "/of")
-    private ResponseEntity<PartiesDTO.Response.PartiesList> getPartiesOfUser(@RequestBody PartiesDTO.Request.GetPartiesOf request){
-        return partiesService.getPartiesOfUser(request.getUsername());
+    private ResponseEntity<PartiesDTO.Response.PartiesList> getPartiesOfUser(@RequestParam String username){
+        return partiesService.getPartiesOfUser(username);
     }
 
     @GetMapping(path = "/{id}/info")

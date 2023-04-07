@@ -17,13 +17,13 @@ public class FriendsController {
     }
 
     @GetMapping
-    public ResponseEntity<FriendsDTO.Response.GetFriends> getFriends(@RequestBody FriendsDTO.Request.Get request){
-        return friendsService.getFriends(request.getUsername());
+    public ResponseEntity<FriendsDTO.Response.GetFriends> getFriends(@RequestParam String username){
+        return friendsService.getFriends(username);
     }
 
     @GetMapping(path = "/requests")
-    public ResponseEntity<FriendsDTO.Response.GetFriendRequests> getFriendRequests(@RequestBody FriendsDTO.Request.Get request){
-        return friendsService.getFriendRequests(request.getUsername());
+    public ResponseEntity<FriendsDTO.Response.GetFriendRequests> getFriendRequests(@RequestParam String username){
+        return friendsService.getFriendRequests(username);
     }
 
     @PostMapping("/requests/send")
