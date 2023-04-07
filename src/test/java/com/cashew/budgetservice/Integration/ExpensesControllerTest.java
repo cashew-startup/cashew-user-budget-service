@@ -18,12 +18,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 
@@ -86,42 +84,30 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/day")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }"""))
+                        .param("username", "TestUser1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").isEmpty());
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/week")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }"""))
+                        .param("username", "TestUser1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").isEmpty());
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/year")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }"""))
+                        .param("username", "TestUser1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").isEmpty());
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/period")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1",
-                                    "from": "2022-09-01",
-                                    "to": "2023-03-01"
-                                }"""))
+                        .param("username", "TestUser1")
+                        .param("from", "2022-09-01")
+                        .param("to", "2023-03-01"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
@@ -209,10 +195,7 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/day")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }"""))
+                        .param("username", "TestUser1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
@@ -220,10 +203,7 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/week")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }"""))
+                        .param("username", "TestUser1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
@@ -231,10 +211,7 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/month")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }"""))
+                        .param("username", "TestUser1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
@@ -242,10 +219,7 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/year")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }"""))
+                        .param("username", "TestUser1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
@@ -253,12 +227,9 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/period")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1",
-                                    "from": "2022-09-01",
-                                    "to": "2023-03-01"
-                                }"""))
+                        .param("username", "TestUser1")
+                        .param("from", "2022-09-01")
+                        .param("to", "2023-03-01"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())

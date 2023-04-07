@@ -56,10 +56,7 @@ public class FriendsControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/friends")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }"""))
+                        .param("username", "TestUser1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("friends").isEmpty());
@@ -71,10 +68,7 @@ public class FriendsControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/friends/requests")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }"""))
+                        .param("username", "TestUser1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("friendRequests").isEmpty());
@@ -115,22 +109,14 @@ public class FriendsControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/friends/requests")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }
-                                """))
+                        .param("username", "TestUser1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("friendRequests").isEmpty());
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/friends/requests")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser3"
-                                }
-                                """)
+                        .param("username", "TestUser3")
                 )
                 .andExpectAll(
                         status().isOk(),
@@ -159,11 +145,7 @@ public class FriendsControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/friends")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }
-                                """))
+                        .param("username", "TestUser1"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -171,11 +153,7 @@ public class FriendsControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/friends")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser3"
-                                }
-                                """))
+                        .param("username", "TestUser3"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -201,11 +179,7 @@ public class FriendsControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/friends/requests")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser3"
-                                }
-                                """))
+                        .param("username", "TestUser3"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -213,11 +187,7 @@ public class FriendsControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/friends")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser3"
-                                }
-                                """))
+                        .param("username", "TestUser3"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -243,11 +213,7 @@ public class FriendsControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/friends")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser3"
-                                }
-                                """))
+                        .param("username", "TestUser3"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -255,11 +221,7 @@ public class FriendsControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/friends")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser2"
-                                }
-                                """))
+                        .param("username", "TestUser2"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -267,11 +229,7 @@ public class FriendsControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/friends")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "username": "TestUser1"
-                                }
-                                """))
+                        .param("username", "TestUser1"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),

@@ -22,18 +22,18 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<UsersDTO.Response.Found> getUserById(@RequestBody UsersDTO.Request.GetById request){
-        return usersService.getUserById(request.getId());
+    public ResponseEntity<UsersDTO.Response.Found> getUserById(@RequestParam Long id){
+        return usersService.getUserById(id);
     }
 
     @GetMapping(path = "/byUsername")
-    public ResponseEntity<UsersDTO.Response.Found> getUserByUsername(@RequestBody UsersDTO.Request.GetByUsername request){
-        return  usersService.getUserByUsername(request.getUsername());
+    public ResponseEntity<UsersDTO.Response.Found> getUserByUsername(@RequestParam String username){
+        return  usersService.getUserByUsername(username);
     }
 
     @GetMapping("/byEmail")
-    public ResponseEntity<UsersDTO.Response.Found> getUserByEmail(@RequestBody UsersDTO.Request.GetByEmail request){
-        return  usersService.getUserByEmail(request.getEmail());
+    public ResponseEntity<UsersDTO.Response.Found> getUserByEmail(@RequestParam String email){
+        return  usersService.getUserByEmail(email);
     }
 
     @PutMapping
