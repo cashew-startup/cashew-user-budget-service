@@ -1,0 +1,24 @@
+version: '3'
+services:
+  mysql-standalone-3:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_DATABASE=cashewReceiptDB
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+    ports:
+      - '3302:3306'
+
+  check-service:
+    image: meelesh/check-service
+    ports:
+      - '8085:8085'
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-standalone-3:3306/budget_db?autoReconnect=true&useSSL=false
+      restart: unless-stopped
+    build:
+      context: "./"
+      dockerfile: "Dockerfile_check"
+    depends_on:
+      - mysql-standalone-3

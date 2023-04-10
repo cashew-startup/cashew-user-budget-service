@@ -1,36 +1,41 @@
 package com.cashew.service.receipt;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Slf4j
 public class ReceiptApi {
 
-    private WebDriver driver;
+    private RemoteWebDriver driver;
 
     private final String address = "https://proverkacheka.com/";
 
     @PostConstruct
     private void init() {
+        try {
+            System.setProperty("webdriver.chrome.silentOutput", "true");
+            System.setProperty(ChromeDriverService.CHROME_DRIVER_SILENT_OUTPUT_PROPERTY, "true");
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--headless", "--disable-logging");
 
-        System.setProperty("webdriver.chrome.driver","/home/meelesh/dev/projects/chashew-backend/checkService/src/main/resources/seleniumDriver/chromedriver");
-        System.setProperty("webdriver.chrome.silentOutput", "true");
-        System.setProperty(ChromeDriverService.CHROME_DRIVER_SILENT_OUTPUT_PROPERTY, "true");
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless", "--disable-logging");
-
-        this.driver = new ChromeDriver(options);
+            this.driver = new RemoteWebDriver(new URL("http://194.35.116.155:4444/wd/hub"), options);
+        } catch (Exception e) {
+            log.error("l(0)", e);
+        }
     }
 
     public Receipt receiptByToken(String token) {

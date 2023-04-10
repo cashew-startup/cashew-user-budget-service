@@ -1,7 +1,6 @@
 package com.cashew.controller;
 
 import com.cashew.dto.ReceiptRequestDTO;
-import com.cashew.dto.ReceiptResponseDTO;
 import com.cashew.service.ReceiptService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

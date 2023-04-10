@@ -1,0 +1,9 @@
+FROM openjdk:17
+
+ADD target/receiptSetvice-0.0.1-SNAPSHOT.jar receiptSetvice-0.0.1-SNAPSHOT.jar
+
+COPY src/main/resources/seleniumDriver/chromedriver src/main/resources/seleniumDriver/chromedriver
+
+EXPOSE 8085
+
+ENTRYPOINT ["java", "-jar", "receiptSetvice-0.0.1-SNAPSHOT.jar"]

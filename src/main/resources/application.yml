@@ -1,0 +1,15 @@
+spring:
+  profiles:
+    active: prod
+  datasource:
+    username: admin
+    password: admin
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+  jpa:
+    hibernate.ddl-auto: update
+    generate-ddl: true
+    show-sql: true
+
+server:
+  port: ${PORT}
