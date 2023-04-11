@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
 @Component
@@ -68,6 +69,7 @@ public class PartiesService {
 
     @Transactional
     public ResponseEntity<PartiesDTO.Response.Success> addUserToParty(Long partyId, String username) {
+        username = username.toLowerCase(Locale.ROOT).trim();
         Party p = partyRepository
                 .findById(partyId)
                 .orElseThrow(() -> new NoSuchElementException("No party with such id"));

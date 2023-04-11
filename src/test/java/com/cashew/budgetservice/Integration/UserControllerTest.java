@@ -33,6 +33,10 @@ class UserControllerTest {
         this.mockMvc = mockMvc;
     }
 
+    @BeforeAll
+    public void setUp() {
+    }
+
     @Test
     @Order(1)
     void createUserSuccessfully() throws Exception{

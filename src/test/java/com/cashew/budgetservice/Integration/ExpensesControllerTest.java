@@ -41,7 +41,6 @@ public class ExpensesControllerTest {
 
     @TestConfiguration
     static class MyTestConfiguration {
-
         @Bean
         public FetchReceiptService fetchReceiptServiceMOCK() {
             return Mockito.mock(FetchReceiptService.class);
@@ -54,12 +53,9 @@ public class ExpensesControllerTest {
                                FetchReceiptService fetchReceiptServiceMOCK){
             return new ExpensesService(userCheckRepository, receiptRepository, userRepository, fetchReceiptServiceMOCK);
         }
-
     }
     @Autowired
     private FetchReceiptService fetchReceiptServiceMOCK;
-
-
 
     @Autowired
     public ExpensesControllerTest(UsersService usersService, MockMvc mockMvc) {

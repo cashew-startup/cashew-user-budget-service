@@ -104,7 +104,7 @@ public class PartyControllerTest {
                         .content("""
                                 {
                                     "partyId": 0,
-                                    "guestId": 0
+                                    "username": ""
                                 }"""))
                 .andExpectAll(
                         status().isNotFound(),
