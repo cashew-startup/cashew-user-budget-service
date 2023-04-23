@@ -42,12 +42,9 @@ public class FriendsControllerTest {
 
     @AfterAll
     void closeUp(){
-        Long id = usersService.getUserByUsername("TestUser1").getBody().getId();
-        usersService.deleteUserById(id);
-        id = usersService.getUserByUsername("TestUser2").getBody().getId();
-        usersService.deleteUserById(id);
-        id = usersService.getUserByUsername("TestUser3").getBody().getId();
-        usersService.deleteUserById(id);
+        usersService.deleteUserByUsername("testuser1");
+        usersService.deleteUserByUsername("testuser2");
+        usersService.deleteUserByUsername("testuser3");
     }
 
     @Test

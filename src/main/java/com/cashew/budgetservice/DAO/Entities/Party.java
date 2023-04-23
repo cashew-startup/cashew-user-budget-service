@@ -22,6 +22,8 @@ public class Party {
 
     private Long ownerId;
 
+    private String ownerUsername;
+
     @ManyToMany(mappedBy = "parties")
     @ToString.Exclude
     private List<UserDetails> listOfUserDetails;

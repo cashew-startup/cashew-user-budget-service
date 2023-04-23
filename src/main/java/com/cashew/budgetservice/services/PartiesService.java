@@ -26,13 +26,15 @@ public class PartiesService {
     private UserRepository userRepository;
 
     @Transactional
-    public ResponseEntity<PartiesDTO.Response.Created> createParty(String name, Long ownerId) {
+    public ResponseEntity<PartiesDTO.Response.Created> createParty(String name, String ownerUsername) {
         name = name.toLowerCase();
-        User u = userRepository.findById(ownerId).orElseThrow(() -> new NoSuchElementException("No user with such id"));
+        String preparedUsername = ownerUsername.toLowerCase(Locale.ROOT).trim();
+        User u = userRepository.findByUsername(preparedUsername).orElseThrow(() -> new NoSuchElementException("No user with username="+preparedUsername));
         Party p = new Party();
         p.setName(name);
         p.setDate(LocalDateTime.now());
-        p.setOwnerId(ownerId);
+        p.setOwnerId(u.getId());
+        p.setOwnerUsername(u.getUsername());
         p.setListOfUserDetails(new ArrayList<>());
         p.getListOfUserDetails().add(u.getUserDetails());
         partyRepository.save(p);
@@ -60,7 +62,7 @@ public class PartiesService {
 
     public ResponseEntity<PartiesDTO.Response.PartiesList> getPartiesOfUser(String username) {
         List<Party> parties = userRepository
-                .findTopByUsername(username)
+                .findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("No user with such username"))
                 .getUserDetails()
                 .getParties();
@@ -74,7 +76,7 @@ public class PartiesService {
                 .findById(partyId)
                 .orElseThrow(() -> new NoSuchElementException("No party with such id"));
         User u = userRepository
-                .findTopByUsername(username)
+                .findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("No user with such username"));
         if (u.getUserDetails().getParties().contains(p)
                 ||
@@ -95,7 +97,7 @@ public class PartiesService {
                 .findById(partyId)
                 .orElseThrow(()->new NoSuchElementException("No party with such id"));
         User u = userRepository
-                .findTopByUsername(username)
+                .findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("No user with such id"));
         if (username.equals(userRepository.findById(p.getOwnerId()).get().getUsername())){
             throw new IllegalArgumentException("Can't remove owner from party");

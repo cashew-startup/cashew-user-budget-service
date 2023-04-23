@@ -4,9 +4,10 @@ import lombok.Data;
 import lombok.Value;
 
 public enum UsersDTO {;
-    private interface Id { Long getId(); }
     private interface Username { String getUsername(); }
+    private interface NewUsername { String getNewUsername(); }
     private interface Email { String getEmail(); }
+    private interface NewEmail { String getNewEmail(); }
 
     public enum Request{;
         @Data
@@ -16,16 +17,10 @@ public enum UsersDTO {;
         }
 
         @Data
-        public static class UpdateUser implements Id, Username, Email{
-            Long id;
+        public static class GetByUsername implements Username{
             String username;
-            String email;
         }
 
-        @Data
-        public static class GetById implements Id{
-            Long id;
-        }
 
         @Data
         public static class GetByEmail implements Email{
@@ -33,32 +28,37 @@ public enum UsersDTO {;
         }
 
         @Data
-        public static class GetByUsername implements Username{
-            String username;
+        public static class UpdateUsername implements NewUsername, Email{
+            String newUsername;
+            String email;
         }
 
         @Data
-        public static class Delete implements Id{
-            Long id;
+        public static class UpdateEmail implements Username, NewEmail{
+            String username;
+            String newEmail;
+        }
+
+        @Data
+        public static class Delete implements Username{
+            String username;
         }
     }
 
     public enum Response{;
         @Value
-        public static class Created implements Id{
-            Long id;
+        public static class Created {
+            boolean success;
         }
 
         @Value
-        public static class Updated implements Id, Username, Email{
-            Long id;
+        public static class Updated implements Username, Email{
             String username;
             String email;
         }
 
         @Value
-        public static class Found implements Id, Username, Email{
-            Long id;
+        public static class Found implements Username, Email{
             String username;
             String email;
         }

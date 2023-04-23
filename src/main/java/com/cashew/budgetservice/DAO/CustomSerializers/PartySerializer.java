@@ -27,6 +27,7 @@ public class PartySerializer extends StdSerializer<Party> {
         generator.writeNumberField("id", party.getId());
         generator.writeStringField("name", party.getName());
         generator.writeStringField("owner id",party.getOwnerId().toString());
+        generator.writeStringField("owner username",party.getOwnerUsername());
         generator.writeStringField("date", party.getDate().toString());
         generator.writeArrayFieldStart("users");
         for (UserDetails ud : party.getListOfUserDetails()){

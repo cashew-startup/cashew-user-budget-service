@@ -6,15 +6,15 @@ import com.cashew.budgetservice.DAO.Repos.UserDetailsRepository;
 import com.cashew.budgetservice.DAO.Repos.UserRepository;
 import com.cashew.budgetservice.DTO.UsersDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class UsersService {
@@ -47,60 +47,79 @@ public class UsersService {
         u.setUserDetails(ud);
         userRepository.save(u);
         return new ResponseEntity<>(
-                new UsersDTO.Response.Created(u.getId()),
+                new UsersDTO.Response.Created(true),
                 HttpStatus.CREATED);
     }
 
     public ResponseEntity<UsersDTO.Response.Found> getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No user with such id"));
         return new ResponseEntity<>(
-                new UsersDTO.Response.Found(user.getId(), user.getUsername(), user.getEmail()),
+                new UsersDTO.Response.Found(user.getUsername(), user.getEmail()),
                 HttpStatus.OK);
     }
 
     public ResponseEntity<UsersDTO.Response.Found> getUserByUsername(String username) {
-        username = username.toLowerCase().trim();
-        User user = userRepository.findTopByUsername(username).orElseThrow(() -> new NoSuchElementException("No user with such username"));
+        String preparedUsername = username.toLowerCase().trim();
+        User user = userRepository
+                .findByUsername(preparedUsername)
+                .orElseThrow(() -> new NoSuchElementException("No user with username="+ preparedUsername));
         return new ResponseEntity<>(
-                new UsersDTO.Response.Found(user.getId(), user.getUsername(), user.getEmail()),
+                new UsersDTO.Response.Found(user.getUsername(), user.getEmail()),
                 HttpStatus.OK);
     }
 
     public ResponseEntity<UsersDTO.Response.Found> getUserByEmail(String email) {
-        email = email.toLowerCase().trim();
-        User user = userRepository.findTopByEmail(email).orElseThrow(() -> new NoSuchElementException("No user with such email"));
+        String preparedEmail = email.toLowerCase().trim();
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new NoSuchElementException("No user with such email="+ preparedEmail));
         return new ResponseEntity<>(
-                new UsersDTO.Response.Found(user.getId(), user.getUsername(), user.getEmail()),
+                new UsersDTO.Response.Found(user.getUsername(), user.getEmail()),
                 HttpStatus.OK);
     }
 
-    public ResponseEntity<UsersDTO.Response.Updated> updateUser(Long id, String username, String email) {
-        username = username.toLowerCase().trim();
-        email = email.toLowerCase().trim();
-        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No user with such id"));
-        user.setUsername(username);
-        user.setEmail(email);
+    public ResponseEntity<UsersDTO.Response.Updated> updateUsername(String newUsername, String email) {
+        newUsername = newUsername.toLowerCase().trim();
+        String preparedEmail = email.toLowerCase().trim();
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new NoSuchElementException("No user with such email="+ preparedEmail));
+        user.setUsername(newUsername);
         userRepository.save(user);
         return new ResponseEntity<>(
-                new UsersDTO.Response.Updated(user.getId(), user.getUsername(), user.getEmail()),
+                new UsersDTO.Response.Updated(user.getUsername(), user.getEmail()),
+                HttpStatus.OK);
+    }
+
+    public ResponseEntity<UsersDTO.Response.Updated> updateEmail(String username, String newEmail) {
+        String preparedUsername = username.toLowerCase().trim();
+        newEmail = newEmail.toLowerCase(Locale.ROOT).trim();
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("No user with such username="+ preparedUsername));
+        user.setEmail(newEmail);
+        userRepository.save(user);
+        return new ResponseEntity<>(
+                new UsersDTO.Response.Updated(user.getUsername(), user.getEmail()),
                 HttpStatus.OK);
     }
 
     @Transactional
-    public ResponseEntity<UsersDTO.Response.Deleted> deleteUserById(Long id) {
+    public ResponseEntity<UsersDTO.Response.Deleted> deleteUserByUsername(String username) {
         User user = userRepository
-                .findById(id)
-                .orElseThrow(() -> new NoSuchElementException("No user with such id"));
+                .findByUsername(username.toLowerCase(Locale.ROOT).trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with username=" + username));
         UserDetails userDetails = userDetailsRepository
                 .findById(user.getUserDetails().getId())
-                .orElseThrow(() -> new NoSuchElementException("Check database. UserID != UserDetailsID"));
-        userDetailsRepository.deleteFriendRequestsByUserDetailsId(id);
-        userDetailsRepository.deleteFriendsByUserDetailsId(id);
-        userDetailsRepository.deleteUserDetailsFromAllParties(id);
-        userDetailsRepository.deleteAllUserChecksOfUserDetails(id);
+                .orElseThrow(() -> new DataRetrievalFailureException(""));
+        Long userDetailsId = userDetails.getId();
+        userDetailsRepository.deleteFriendRequestsByUserDetailsId(userDetailsId);
+        userDetailsRepository.deleteFriendsByUserDetailsId(userDetailsId);
+        userDetailsRepository.deleteUserDetailsFromAllParties(userDetailsId);
+        userDetailsRepository.deleteAllUserChecksOfUserDetails(userDetailsId);
         userDetailsRepository.save(userDetails);
         userDetailsRepository.delete(userDetails);
-        userRepository.deleteById(id);
+        userRepository.deleteById(user.getId());
         return new ResponseEntity<>(
                 new UsersDTO.Response.Deleted(true),
                 HttpStatus.OK

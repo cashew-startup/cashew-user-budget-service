@@ -18,7 +18,7 @@ public class PartyController {
 
     @PostMapping
     private ResponseEntity<PartiesDTO.Response.Created> createParty(@RequestBody PartiesDTO.Request.Create request) {
-        return partiesService.createParty(request.getName(), request.getOwnerId());
+        return partiesService.createParty(request.getName(), request.getOwnerUsername());
     }
 
     @GetMapping(path = "/{id}")

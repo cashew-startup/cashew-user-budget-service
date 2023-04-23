@@ -25,8 +25,6 @@ class UserControllerTest {
     private MockMvc mockMvc;
     private UsersService usersService;
 
-    private Integer testUserId;
-
     @Autowired
     public UserControllerTest(UsersService usersService, MockMvc mockMvc) {
         this.usersService = usersService;
@@ -52,7 +50,7 @@ class UserControllerTest {
                 .andExpectAll(
                         status().isCreated(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("id").exists());
+                        jsonPath("success").value(true));
     }
 
     @Test
@@ -88,8 +86,8 @@ class UserControllerTest {
 
     @Test
     @Order(3)
-    void getUserByUsernameThenByEmailThenById() throws Exception {
-        /*Get by username and remember id*/
+    void getUserByUsernameThenByEmail() throws Exception {
+        /*Get by username*/
         ResultActions response = this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/users/byUsername")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -97,10 +95,8 @@ class UserControllerTest {
         response.andExpectAll(
                 status().isOk(),
                 content().contentType(MediaType.APPLICATION_JSON),
-                jsonPath("id").exists(),
                 jsonPath("username").value("testuser1"),
                 jsonPath("email").value("example@yahoo.com"));
-        testUserId = JsonPath.parse(response.andReturn().getResponse().getContentAsString()).read("id");
         /*Get by username with wrong username*/
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/users/byUsername")
@@ -109,7 +105,7 @@ class UserControllerTest {
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("description").value("No user with such username"));
+                        jsonPath("description").value("No user with username=randomusername123"));
         /*Get by email with proper email*/
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/users/byEmail")
@@ -118,7 +114,6 @@ class UserControllerTest {
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("id").exists(),
                         jsonPath("username").value("testuser1"),
                         jsonPath("email").value("example@yahoo.com"));
         /*Get by email with wrong email*/
@@ -129,57 +124,59 @@ class UserControllerTest {
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("description").value("No user with such email"));
-        /*Get by id with wrong id*/
-        this.mockMvc
-                .perform(get("http://localhost:8080/api/v1/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("id", testUserId.toString()))
-                .andExpectAll(
-                        status().isOk(),
-                        content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("id").exists(),
-                        jsonPath("username").value("testuser1"),
-                        jsonPath("email").value("example@yahoo.com"));
-        /*Get by id with wrong id*/
-        this.mockMvc
-                .perform(get("http://localhost:8080/api/v1/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("id", "0"))
-                .andExpectAll(
-                        status().isNotFound(),
-                        content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("description").value("No user with such id"));
+                        jsonPath("description").value("No user with such email=randomemail123"));
     }
 
     @Test
     void updateUser() throws Exception {
-        /*Update user info*/
+        /*Update username*/
         this.mockMvc
-                .perform(put("http://localhost:8080/api/v1/users")
+                .perform(put("http://localhost:8080/api/v1/users/updateUsername")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                    "id": %s,
-                                    "username": "UpdatedUsername",
-                                    "email": "UpdatedEmail"
+                                    "newUsername": "UpdatedUsername",
+                                    "email": "example@yahoo.com"
                                 }
-                                """.formatted(testUserId)))
+                                """))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("id").value(testUserId),
+                        jsonPath("username").value("updatedusername"),
+                        jsonPath("email").value("example@yahoo.com"));
+        /*Check username was really updated*/
+        this.mockMvc
+                .perform(get("http://localhost:8080/api/v1/users/byUsername")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("username", "updatedusername"))
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentType(MediaType.APPLICATION_JSON),
+                        jsonPath("username").value("updatedusername"),
+                        jsonPath("email").value("example@yahoo.com"));
+        /*Update email*/
+        this.mockMvc
+                .perform(put("http://localhost:8080/api/v1/users/updateEmail")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "username": "updatedusername",
+                                    "newEmail": "UpdatedEmail"
+                                }
+                                """))
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentType(MediaType.APPLICATION_JSON),
                         jsonPath("username").value("updatedusername"),
                         jsonPath("email").value("updatedemail"));
-        /*Check data was really updated*/
+        /*Check email was really updated*/
         this.mockMvc
-                .perform(get("http://localhost:8080/api/v1/users")
+                .perform(get("http://localhost:8080/api/v1/users/byEmail")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("id", testUserId.toString()))
+                        .param("email", "updatedemail"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("id").value(testUserId),
                         jsonPath("username").value("updatedusername"),
                         jsonPath("email").value("updatedemail"));
     }
@@ -192,21 +189,21 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                    "id": %s
+                                    "username": "%s"
                                 }
-                                """.formatted(testUserId)))
+                                """.formatted("updatedusername")))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
                         jsonPath("success").value(true));
         /*Check it was really deleted*/
         this.mockMvc
-                .perform(get("http://localhost:8080/api/v1/users")
+                .perform(get("http://localhost:8080/api/v1/users/byUsername")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("id", testUserId.toString()))
+                        .param("username","updatedusername"))
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("description").value("No user with such id"));
+                        jsonPath("description").value("No user with username=updatedusername"));
     }
 }

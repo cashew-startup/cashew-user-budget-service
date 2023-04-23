@@ -9,6 +9,7 @@ import com.cashew.budgetservice.exceptions.FetchDataException;
 import com.cashew.budgetservice.services.ExpensesService;
 import com.cashew.budgetservice.services.FetchReceiptService;
 import com.cashew.budgetservice.services.UsersService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -70,8 +71,7 @@ public class ExpensesControllerTest {
 
     @AfterAll
     void closeUp(){
-        Long id = usersService.getUserByUsername("TestUser1").getBody().getId();
-        usersService.deleteUserById(id);
+        usersService.deleteUserByUsername("TestUser1");
     }
 
     @Test
@@ -187,7 +187,81 @@ public class ExpensesControllerTest {
 
     @Test
     @Order(4)
-    public void testGetExpensesWhenExpensesExist() throws Exception {
+    public void testAddCheckAndDisableIt() throws Exception {
+        when(fetchReceiptServiceMOCK.fetchReceipt("testuser1","t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1"))
+                .thenReturn(new Receipt()
+                        .setCompany("ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ДОМ КОМИКСОВ \"МАЯК\"")
+                        .setAddress("190121, г.Санкт-Петербург, наб.Адмиралтейского канала, д.2, литер Т")
+                        .setINN("7804588265")
+                        .setDate(ZonedDateTime.of(
+                                2023,
+                                1,
+                                20,
+                                20,
+                                27,
+                                0,
+                                0,
+                                ZonedDateTime.now().getZone())
+                        )
+                        .setReceiptNumber("Чек № 55")
+                        .setShift("Смена № 35")
+                        .setCashier("Кассир Потапов Глеб")
+                        .setTotal(BigDecimal.valueOf(4200.0))
+                        .setCash(BigDecimal.valueOf(0.0))
+                        .setCard(BigDecimal.valueOf(4200.0))
+                        .setVAT20(BigDecimal.valueOf(4200.0))
+                        .setVAT10(BigDecimal.valueOf(0.0))
+                        .setTaxation("ВИД НАЛОГООБЛОЖЕНИЯ: УСН доход - расход")
+                        .setProducts(Arrays.asList(
+                                        new Product()
+                                                .setName("Фигурка Funko POP! Animation Avatar Spirit Aang (GW) (Exc) 55052")
+                                                .setDescription("")
+                                                .setCurrency("RUB")
+                                                .setPricePerUnit(BigDecimal.valueOf(2200.0))
+                                                .setQuantity(1.0)
+                                                .setTotalPrice(BigDecimal.valueOf(2200.0)),
+                                        new Product()
+                                                .setName("Фигурка Funko POP! Animation Avatar The Last Airbender Appa (540) 36468")
+                                                .setDescription("")
+                                                .setCurrency("RUB")
+                                                .setPricePerUnit(BigDecimal.valueOf(2000.0))
+                                                .setQuantity(1.0)
+                                                .setTotalPrice(BigDecimal.valueOf(2000.0))
+                                )
+                        )
+                );
+        this.mockMvc
+                .perform(post("http://localhost:8080/api/v1/expenses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "username": "TestUser1",
+                                    "token": "t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1"
+                                }"""))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("success").value("true"));
+        this.mockMvc
+                .perform(delete("http://localhost:8080/api/v1/expenses")
+                        .param("username","TestUser1")
+                        .param("receiptId", "2"))
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentType(MediaType.APPLICATION_JSON),
+                        jsonPath("success").value("true"));
+    }
+
+    @Test
+    @Order(5)
+    public void testGetExpensesWhenExpenseExist() throws Exception {
+        this.mockMvc
+                .perform(get("http://localhost:8080/api/v1/expenses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("username", "TestUser1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("expenses").exists())
+                .andExpect(jsonPath("expenses", Matchers.hasSize(1)));
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/day")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -195,7 +269,7 @@ public class ExpensesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
-                .andExpect(jsonPath("expenses").isEmpty());
+                .andExpect(jsonPath("expenses", Matchers.hasSize(0)));
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/week")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -203,7 +277,7 @@ public class ExpensesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
-                .andExpect(jsonPath("expenses").isEmpty());
+                .andExpect(jsonPath("expenses", Matchers.hasSize(0)));
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/month")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -211,7 +285,7 @@ public class ExpensesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
-                .andExpect(jsonPath("expenses").isEmpty());
+                .andExpect(jsonPath("expenses", Matchers.hasSize(0)));
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/year")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -219,7 +293,7 @@ public class ExpensesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
-                .andExpect(jsonPath("expenses").isNotEmpty());
+                .andExpect(jsonPath("expenses", Matchers.hasSize(1)));
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/period")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -229,7 +303,8 @@ public class ExpensesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
-                .andExpect(jsonPath("expenses").isNotEmpty());
+                .andExpect(jsonPath("expenses", Matchers.hasSize(1)));
     }
+
 
 }

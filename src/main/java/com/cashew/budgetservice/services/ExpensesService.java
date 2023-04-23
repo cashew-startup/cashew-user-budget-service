@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,42 +40,40 @@ public class ExpensesService {
         this.fetchReceiptService = fetchReceiptService;
     }
 
-    public List<UserCheck> getUserChecks(String username, ZonedDateTime from) throws NoSuchElementException {
-        long userDetailsId = userRepository
-                .findTopByUsername(username)
-                .orElseThrow(() -> new NoSuchElementException("No user with such username"))
-                .getUserDetails()
-                .getId();
-        return userCheckRepository.findAllByUserDetailsAndDateAfter(userDetailsId, from);
+    public List<UserCheck> getUserChecksFromDate(String username, ZonedDateTime from) throws NoSuchElementException {
+        long userDetailsId = getUserDetailsIdByUsername(username);
+        return userCheckRepository.findAllByUserDetailsIdAndDateAfter(userDetailsId, from);
+    }
+
+    public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getAllExpenses(String username) {
+        long userDetailsId = getUserDetailsIdByUsername(username);
+        List<UserCheck> checks = userCheckRepository.findAllByUserDetailsIdAndIsDisabled(userDetailsId, false);
+        return new ResponseEntity<>(new ExpensesDTO.Response.RequestedChecks().setExpensesAsChecks(checks), HttpStatus.OK);
     }
 
     public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerLastDay(String username) {
-        List<UserCheck> checks = getUserChecks(username.toLowerCase(Locale.ROOT).trim(), ZonedDateTime.now().minusDays(1L));
+        List<UserCheck> checks = getUserChecksFromDate(username.toLowerCase(Locale.ROOT).trim(), ZonedDateTime.now().minusDays(1L));
         return new ResponseEntity<>(new ExpensesDTO.Response.RequestedChecks().setExpensesAsChecks(checks), HttpStatus.OK);
     }
 
     public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerLastWeek(String username) {
-        List<UserCheck> checks = getUserChecks(username.toLowerCase(Locale.ROOT).trim(), ZonedDateTime.now().minusDays(6));
+        List<UserCheck> checks = getUserChecksFromDate(username.toLowerCase(Locale.ROOT).trim(), ZonedDateTime.now().minusDays(6));
         return new ResponseEntity<>(new ExpensesDTO.Response.RequestedChecks().setExpensesAsChecks(checks), HttpStatus.OK);
     }
 
     public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerLastMonth(String username) {
-        Iterable<UserCheck> checks = getUserChecks(username.toLowerCase(Locale.ROOT).trim(), ZonedDateTime.now().minusDays(30));
+        Iterable<UserCheck> checks = getUserChecksFromDate(username.toLowerCase(Locale.ROOT).trim(), ZonedDateTime.now().minusDays(30));
         return new ResponseEntity<>(new ExpensesDTO.Response.RequestedChecks().setExpensesAsChecks(checks), HttpStatus.OK);
     }
 
     public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerLastYear(String username) {
-        Iterable<UserCheck> checks = getUserChecks(username.toLowerCase(Locale.ROOT).trim(), ZonedDateTime.now().minusYears(1));
+        Iterable<UserCheck> checks = getUserChecksFromDate(username.toLowerCase(Locale.ROOT).trim(), ZonedDateTime.now().minusYears(1));
         return new ResponseEntity<>(new ExpensesDTO.Response.RequestedChecks().setExpensesAsChecks(checks), HttpStatus.OK);
     }
 
     public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerCustomPeriod(String username, String from, String to) {
-        long userDetailsId = userRepository
-                .findTopByUsername(username.toLowerCase(Locale.ROOT).trim())
-                .orElseThrow()
-                .getUserDetails()
-                .getId();
-        List<UserCheck> checks = userCheckRepository.findAllByUserDetailsAndDateIn(
+        long userDetailsId = getUserDetailsIdByUsername(username);
+        List<UserCheck> checks = userCheckRepository.findAllByUserDetailsIdAndDateIn(
                 userDetailsId,
                 prepareZonedDateTime(from),
                 prepareZonedDateTime(to));
@@ -86,15 +83,21 @@ public class ExpensesService {
     @Transactional
     public ResponseEntity<ExpensesDTO.Response.Success> addReceipt(String username, String token) {
         Receipt receipt = fetchReceiptService.fetchReceipt(username.toLowerCase(Locale.ROOT).trim(), token);
-        receiptRepository.save(receipt);
         UserCheck userCheck = new UserCheck();
         userCheck.setReceipt(receipt);
         userCheck.setUserDetails(
                 userRepository
-                        .findTopByUsername(username.toLowerCase(Locale.ROOT).trim())
+                        .findByUsername(username.toLowerCase(Locale.ROOT).trim())
                         .orElseThrow(() -> new NoSuchElementException("No user with such username"))
                         .getUserDetails());
         userCheckRepository.save(userCheck);
+        return new ResponseEntity<>(new ExpensesDTO.Response.Success(true), HttpStatus.OK);
+    }
+
+    public ResponseEntity<ExpensesDTO.Response.Success> disableReceiptForUser(String username, Long userCheckId) {
+        UserCheck check = userCheckRepository.findById(userCheckId).orElseThrow(() -> new NoSuchElementException("Cannot find receipt with id:" + userCheckId));
+        check.setIsDisabled(true);
+        userCheckRepository.save(check);
         return new ResponseEntity<>(new ExpensesDTO.Response.Success(true), HttpStatus.OK);
     }
 
@@ -109,7 +112,13 @@ public class ExpensesService {
                 0,
                 0,
                 ZonedDateTime.now().getZone());
+    }
 
-
+    private Long getUserDetailsIdByUsername(String username){
+        return userRepository
+                .findByUsername(username.toLowerCase(Locale.ROOT).trim())
+                .orElseThrow(() -> new NoSuchElementException("No user with such username"))
+                .getUserDetails()
+                .getId();
     }
 }

@@ -50,6 +50,8 @@ public class RemoveDataTests {
     private PartiesService partiesService;
     private UsersService usersService;
     private FetchReceiptService fetchReceiptServiceMOCK;
+    private String exampleReceiptToken = "t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1";
+
 
     @Autowired
     public RemoveDataTests(ExpensesService expensesService,
@@ -64,7 +66,6 @@ public class RemoveDataTests {
         this.fetchReceiptServiceMOCK = fetchReceiptServiceMOCK;
     }
 
-    private String exampleReceiptToken = "t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1";
 
     @Test
     @Order(1)
@@ -120,25 +121,25 @@ public class RemoveDataTests {
         String username = "TestUser1";
         String friendUsername = "friendUser";
         String friendRequesterUsername = "friendRequestUser";
-        Long testUserId = usersService.createUser(username,"example@g.com").getBody().getId();
-        Long friendUserId = usersService.createUser(friendUsername, "friend@f.com").getBody().getId();
-        Long friendRequesterId = usersService.createUser(friendRequesterUsername, "friend@request.com").getBody().getId();
+        usersService.createUser(username,"e@a.com");
+        usersService.createUser(friendUsername,"e@b.com");
+        usersService.createUser(friendRequesterUsername,"e@c.com");
         friendsService.sendRequest(friendUsername, username);
         friendsService.acceptRequest(friendUsername, username);
         friendsService.sendRequest(friendRequesterUsername, username);
         expensesService.addReceipt(username, exampleReceiptToken);
-        Long partyId1 = partiesService.createParty("Test Party1", testUserId).getBody().getPartyId();
-        Long partyId2 = partiesService.createParty("Test Party2", friendUserId).getBody().getPartyId();
+        Long partyId1 = partiesService.createParty("Test Party1", username).getBody().getPartyId();
+        Long partyId2 = partiesService.createParty("Test Party2", friendUsername).getBody().getPartyId();
         partiesService.addUserToParty(partyId1, friendUsername);
         partiesService.addUserToParty(partyId2, username);
         System.out.println(partiesService.getFullInfoOfParty(partyId1).getBody());
         System.out.println(partiesService.getFullInfoOfParty(partyId2).getBody());
-        usersService.deleteUserById(testUserId);
-        usersService.deleteUserById(friendUserId);
-        usersService.deleteUserById(friendRequesterId);
-        assertThrows(NoSuchElementException.class, () -> usersService.getUserById(testUserId));
-        assertThrows(NoSuchElementException.class, () -> usersService.getUserById(friendUserId));
-        assertThrows(NoSuchElementException.class, () -> usersService.getUserById(friendRequesterId));
+        usersService.deleteUserByUsername(username);
+        usersService.deleteUserByUsername(friendUsername);
+        usersService.deleteUserByUsername(friendRequesterUsername);
+        assertThrows(NoSuchElementException.class, () -> usersService.getUserByUsername(username));
+        assertThrows(NoSuchElementException.class, () -> usersService.getUserByUsername(friendUsername));
+        assertThrows(NoSuchElementException.class, () -> usersService.getUserByUsername(friendRequesterUsername));
         partiesService.deleteParty(partyId1);
         partiesService.deleteParty(partyId2);
         assertThrows(NoSuchElementException.class, () -> partiesService.getFullInfoOfParty(partyId1));

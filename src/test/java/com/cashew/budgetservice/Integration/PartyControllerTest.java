@@ -28,9 +28,6 @@ public class PartyControllerTest {
     private UsersService usersService;
     private MockMvc mockMvc;
 
-    private Long ownerUserId;
-    private Long guestUserId1;
-    private Long guestUserId2;
     private Long testPartyId;
     private String testPartyName = "TestParty";
     private String ownerUsername = "owneruser";
@@ -46,16 +43,16 @@ public class PartyControllerTest {
 
     @BeforeAll
     public void setUp() {
-        ownerUserId = usersService.createUser(ownerUsername, "example@g.com").getBody().getId();
-        guestUserId1 = usersService.createUser(guest1Username, "example@y.com").getBody().getId();
-        guestUserId2 = usersService.createUser(guest2Username, "example@t.com").getBody().getId();
+        Assertions.assertTrue(usersService.createUser(ownerUsername, "example@g.com").getBody().isSuccess());
+        Assertions.assertTrue(usersService.createUser(guest1Username, "example@y.com").getBody().isSuccess());
+        Assertions.assertTrue(usersService.createUser(guest2Username, "example@t.com").getBody().isSuccess());
     }
 
     @AfterAll
     void closeUp() {
-        usersService.deleteUserById(ownerUserId);
-        usersService.deleteUserById(guestUserId1);
-        usersService.deleteUserById(guestUserId2);
+        usersService.deleteUserByUsername(ownerUsername);
+        usersService.deleteUserByUsername(guest1Username);
+        usersService.deleteUserByUsername(guest2Username);
     }
 
     @Test
@@ -67,13 +64,13 @@ public class PartyControllerTest {
                         .content("""
                                 {
                                     "name": "%s",
-                                    "ownerId": 0
+                                    "ownerUsername": "0"
                                 }""".formatted(testPartyName)))
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
                         jsonPath("code").value(404),
-                        jsonPath("description").value("No user with such id"));
+                        jsonPath("description").value("No user with username=0"));
     }
 
     @Test
@@ -86,8 +83,8 @@ public class PartyControllerTest {
                         .content("""
                                 {
                                     "name": "%s",
-                                    "ownerId": %s
-                                }""".formatted(testPartyName, ownerUserId)));
+                                    "ownerUsername": "%s"
+                                }""".formatted(testPartyName, ownerUsername)));
         response.andExpectAll(
                 status().isCreated(),
                 content().contentType(MediaType.APPLICATION_JSON),
@@ -198,7 +195,7 @@ public class PartyControllerTest {
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
                         jsonPath("party.id").value(testPartyId),
-                        jsonPath("party.['owner id']").value(ownerUserId),
+                        jsonPath("party.['owner username']").value(ownerUsername),
                         jsonPath("party.users").value(hasItems(ownerUsername,guest1Username,guest2Username)));
     }
 

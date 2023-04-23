@@ -22,6 +22,11 @@ public class ExpensesController {
         return expensesService.addReceipt(request.getUsername(), request.getToken());
     }
 
+    @GetMapping
+    public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpenses(@RequestParam String username){
+        return expensesService.getAllExpenses(username);
+    }
+
     @GetMapping(path = "/day")
     public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpensesPerDay(@RequestParam String username){
         return expensesService.getExpensesPerLastDay(username);
@@ -47,5 +52,11 @@ public class ExpensesController {
                                                                                            @RequestParam String from,
                                                                                            @RequestParam String to){
         return expensesService.getExpensesPerCustomPeriod(username, from, to);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<ExpensesDTO.Response.Success> disableReceiptForUser(@RequestParam String username,
+                                                                              @RequestParam Long receiptId){
+        return expensesService.disableReceiptForUser(username, receiptId);
     }
 }

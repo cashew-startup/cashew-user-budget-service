@@ -20,7 +20,7 @@ public class FriendsService{
 
     public ResponseEntity<FriendsDTO.Response.GetFriends> getFriends(String username) {
         List<User> friends = userRepository
-                .findTopByUsername(username.toLowerCase().trim())
+                .findByUsername(username.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("User not found"))
                 .getUserDetails()
                 .getFriends();
@@ -31,7 +31,7 @@ public class FriendsService{
 
     public ResponseEntity<FriendsDTO.Response.GetFriendRequests> getFriendRequests(String username) {
         List<User> friendRequests = userRepository
-                .findTopByUsername(username.toLowerCase().trim())
+                .findByUsername(username.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("User not found"))
                 .getUserDetails()
                 .getIncomingFriendRequests();
@@ -43,10 +43,10 @@ public class FriendsService{
     @Transactional
     public ResponseEntity<FriendsDTO.Response.Success> sendRequest(String senderUsername, String receiverUsername) {
         User sender = userRepository
-                .findTopByUsername(senderUsername.toLowerCase().trim())
+                .findByUsername(senderUsername.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + senderUsername));
         User receiver = userRepository
-                .findTopByUsername(receiverUsername.toLowerCase().trim())
+                .findByUsername(receiverUsername.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + receiverUsername));
         receiver.getUserDetails().getIncomingFriendRequests().add(sender);
         userRepository.save(receiver);
@@ -56,10 +56,10 @@ public class FriendsService{
     @Transactional
     public ResponseEntity<FriendsDTO.Response.Success> acceptRequest(String senderUsername, String receiverUsername) {
         User sender = userRepository
-                .findTopByUsername(senderUsername.toLowerCase().trim())
+                .findByUsername(senderUsername.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + senderUsername));
         User recipient = userRepository
-                .findTopByUsername(receiverUsername.toLowerCase().trim())
+                .findByUsername(receiverUsername.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + receiverUsername));
         if (!recipient.getUserDetails().getIncomingFriendRequests().remove(sender)) {
             throw new NoSuchElementException("Such friend request was not found");
@@ -75,10 +75,10 @@ public class FriendsService{
     @Transactional
     public ResponseEntity<FriendsDTO.Response.Success> declineRequest(String senderUsername, String receiverUsername) {
         User sender = userRepository
-                .findTopByUsername(senderUsername.toLowerCase().trim())
+                .findByUsername(senderUsername.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + senderUsername));
         User recipient = userRepository
-                .findTopByUsername(receiverUsername.toLowerCase().trim())
+                .findByUsername(receiverUsername.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + receiverUsername));
         if (!recipient.getUserDetails().getIncomingFriendRequests().remove(sender)) {
             throw new NoSuchElementException("Such friend request was not found");
@@ -90,10 +90,10 @@ public class FriendsService{
     @Transactional
     public ResponseEntity<FriendsDTO.Response.Success> removeFromFriends(String username1, String username2) {
         User user1 = userRepository
-                .findTopByUsername(username1.toLowerCase().trim())
+                .findByUsername(username1.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + username1));
         User user2 = userRepository
-                .findTopByUsername(username2.toLowerCase().trim())
+                .findByUsername(username2.toLowerCase().trim())
                 .orElseThrow(() -> new NoSuchElementException("No user with username " + username2));
         if (!user1.getUserDetails().getFriends().remove(user2) ||
                 !user2.getUserDetails().getFriends().remove(user1)) {

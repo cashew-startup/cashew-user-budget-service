@@ -9,7 +9,7 @@ import java.util.List;
 public enum PartiesDTO {;
     private interface PartyId {Long getPartyId();}
     private interface Name {String getName();}
-    private interface OwnerId {Long getOwnerId();}
+    private interface OwnerUsername {String getOwnerUsername();}
     private interface Users {List<String> getUsers();}
     private interface Parties {List<Party> getParties();}
     private interface FullInfo {Party getParty();}
@@ -17,9 +17,9 @@ public enum PartiesDTO {;
 
     public enum Request{;
         @Data
-        public static class Create implements Name, OwnerId{
+        public static class Create implements Name, OwnerUsername{
             String name;
-            Long ownerId;
+            String ownerUsername;
         }
 
         @Data
