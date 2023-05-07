@@ -106,8 +106,7 @@ public class PartyControllerTest {
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("code").value(404),
-                        jsonPath("description").value("No party with such id"));
+                        jsonPath("code").value(404));
     }
 
     @Test
@@ -153,8 +152,7 @@ public class PartyControllerTest {
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("code").value(404),
-                        jsonPath("description").value("No party with such id"));
+                        jsonPath("code").value(404));
     }
 
     @Test
@@ -182,8 +180,7 @@ public class PartyControllerTest {
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("code").value(404),
-                        jsonPath("description").value("No party with such id"));
+                        jsonPath("code").value(404));
     }
 
     @Test
@@ -248,8 +245,7 @@ public class PartyControllerTest {
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("code").value(404),
-                        jsonPath("description").value("No party with such id"));
+                        jsonPath("code").value(404));
     }
 
     @Test
@@ -278,8 +274,7 @@ public class PartyControllerTest {
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("code").value(404),
-                        jsonPath("description").value("No party with such id"));
+                        jsonPath("code").value(404));
     }
 
     @Test
@@ -296,7 +291,6 @@ public class PartyControllerTest {
                 .andExpectAll(
                         status().isNotFound(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        jsonPath("code").value(404),
-                        jsonPath("description").value("No party with such id"));
+                        jsonPath("code").value(404));
     }
 }

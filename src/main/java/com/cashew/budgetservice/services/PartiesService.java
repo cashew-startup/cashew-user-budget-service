@@ -46,7 +46,7 @@ public class PartiesService {
     }
 
     public ResponseEntity<PartiesDTO.Response.UsersList> getUsersOfParty(Long id) {
-        Party party = partyRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No party with such id"));
+        Party party = partyRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No party with such id: " + id));
         List<UserDetails> userDetails = party.getListOfUserDetails();
         List<String> userNames = new ArrayList<>();
         for (UserDetails ud : userDetails) {
@@ -56,7 +56,7 @@ public class PartiesService {
     }
 
     public ResponseEntity<PartiesDTO.Response.FullInfo> getFullInfoOfParty(Long id) {
-        Party party = partyRepository.findPartyById(id).orElseThrow(() -> new NoSuchElementException("No party with such id"));
+        Party party = partyRepository.findPartyById(id).orElseThrow(() -> new NoSuchElementException("No party with such id: " + id));
         return new ResponseEntity<>(new PartiesDTO.Response.FullInfo(party), HttpStatus.OK);
     }
 
