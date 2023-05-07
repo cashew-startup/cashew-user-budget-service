@@ -1,7 +1,6 @@
 package com.cashew.budgetservice.controllers;
 
 import com.cashew.budgetservice.DTO.ExpensesDTO;
-import com.cashew.budgetservice.DTO.ExpensesDTO.Request;
 import com.cashew.budgetservice.services.ExpensesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/expenses")
 public class ExpensesController {
+
     private ExpensesService expensesService;
 
     @Autowired
@@ -17,10 +17,10 @@ public class ExpensesController {
         this.expensesService = expensesService;
     }
 
-    @PostMapping
-    public ResponseEntity<ExpensesDTO.Response.Success> addReceipt(@RequestBody ExpensesDTO.Request.AddReceipt request){
-        return expensesService.addReceipt(request.getUsername(), request.getToken());
-    }
+//    @PostMapping
+//    public ResponseEntity<ExpensesDTO.Response.Success> addReceipt(@RequestBody ExpensesDTO.Request.AddReceipt request) {
+//        return expensesService.addReceipt(request.getUsername(), request.getToken());
+//    }
 
     @GetMapping
     public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpenses(@RequestParam String username){

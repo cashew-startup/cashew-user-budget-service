@@ -30,9 +30,10 @@ public enum ExpensesDTO {;
         }
 
         @Data
-        public static class AddReceipt implements Username, Token {
-            String username;
+        public static class AddReceipt implements Token {
+            String owner;
             String token;
+            List<UserExpensesDTO> expenses;
         }
 
         @Data
