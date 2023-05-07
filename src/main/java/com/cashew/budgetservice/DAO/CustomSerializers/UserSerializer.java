@@ -25,7 +25,7 @@ public class UserSerializer extends StdSerializer<User> {
             User user,
             JsonGenerator generator,
             SerializerProvider provider)
-            throws IOException, JsonProcessingException {
+            throws IOException {
         generator.writeStartObject();
         generator.writeNumberField("id", user.getId());
         generator.writeStringField("username", user.getUsername());

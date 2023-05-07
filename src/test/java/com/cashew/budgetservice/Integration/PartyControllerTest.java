@@ -192,7 +192,7 @@ public class PartyControllerTest {
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
                         jsonPath("party.id").value(testPartyId),
-                        jsonPath("party.['owner username']").value(ownerUsername),
+                        jsonPath("party.['ownerUsername']").value(ownerUsername),
                         jsonPath("party.users").value(hasItems(ownerUsername,guest1Username,guest2Username)));
     }
 
