@@ -17,8 +17,13 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UsersDTO.Response.Created> createNewUser (@RequestBody UsersDTO.Request.Create request) {
+    public ResponseEntity<UsersDTO.Response.Created> createNewUser(@RequestBody UsersDTO.Request.Create request) {
         return usersService.createUser(request.getUsername(), request.getEmail());
+    }
+
+    @GetMapping
+    public ResponseEntity<UsersDTO.Response.Found> getUserById(@RequestParam Long id) {
+        return usersService.getUserById(id);
     }
 
     @GetMapping(path = "/byUsername")
@@ -31,19 +36,14 @@ public class UserController {
         return  usersService.getUserByEmail(email);
     }
 
-    @PutMapping("/updateUsername")
-    public ResponseEntity<UsersDTO.Response.Updated> updateUsername(@RequestBody UsersDTO.Request.UpdateUsername request){
-        return usersService.updateUsername(request.getNewUsername(), request.getEmail());
-    }
-
-    @PutMapping("/updateEmail")
-    public ResponseEntity<UsersDTO.Response.Updated> updateEmail(@RequestBody UsersDTO.Request.UpdateEmail request){
-        return usersService.updateEmail(request.getUsername(), request.getNewEmail());
+    @PutMapping
+    public ResponseEntity<UsersDTO.Response.Updated> updateUser(@RequestBody UsersDTO.Request.UpdateUser request){
+        return usersService.updateUser(request.getId(), request.getUsername(), request.getEmail());
     }
 
     @DeleteMapping
-    public ResponseEntity<UsersDTO.Response.Deleted> deleteUser (@RequestBody UsersDTO.Request.Delete request) {
-        return usersService.deleteUserByUsername(request.getUsername());
+    public ResponseEntity<UsersDTO.Response.Deleted> deleteUserById (@RequestBody UsersDTO.Request.Delete request) {
+        return usersService.deleteUserById(request.getId());
     }
 
 }

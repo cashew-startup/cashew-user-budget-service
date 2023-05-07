@@ -51,6 +51,7 @@ public class UsersService {
                 HttpStatus.CREATED);
     }
 
+    @Deprecated
     public ResponseEntity<UsersDTO.Response.Found> getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No user with such id"));
         return new ResponseEntity<>(
