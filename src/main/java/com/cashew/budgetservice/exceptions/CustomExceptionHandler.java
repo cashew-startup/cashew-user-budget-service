@@ -1,4 +1,4 @@
-package com.cashew.budgetservice;
+package com.cashew.budgetservice.exceptions;
 
 import com.cashew.budgetservice.DTO.StatusDTO;
 import com.cashew.budgetservice.exceptions.FetchDataException;

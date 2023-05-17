@@ -34,5 +34,8 @@ public class Receipt {
     private String taxation;
 
     @OneToMany(cascade = CascadeType.ALL)
+    private List<Product> userChecks;
+
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Product> products;
 }

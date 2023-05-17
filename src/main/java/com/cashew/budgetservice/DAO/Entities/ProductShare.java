@@ -1,26 +1,29 @@
 package com.cashew.budgetservice.DAO.Entities;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
+
 @Entity
 @Data
 @Accessors(chain = true)
-public class UserCheck {
+public class ProductShare {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
+    @JsonIgnore
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @ManyToOne
+    @JoinColumn(name = "user_details_id")
     private UserDetails userDetails;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
-    private Receipt receipt;
+    @JoinColumn
+    private Product product;
 
-    private boolean isPaid = false;
-
-    private boolean isDisabled = false;
+    boolean isPaid = false;
+    private BigDecimal sharedPrice;
 }
