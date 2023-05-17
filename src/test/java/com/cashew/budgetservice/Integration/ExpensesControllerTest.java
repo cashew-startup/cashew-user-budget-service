@@ -80,6 +80,12 @@ public class ExpensesControllerTest {
         usersService.createUser(friendUsername, "example@y.com");
     }
 
+    @AfterAll
+    void closeUp() {
+        usersService.deleteUserByUsername(username);
+        usersService.deleteUserByUsername(friendUsername);
+    }
+
     @Test
     @Order(1)
     public void testGetExpensesWhenNoExpensesYet() throws Exception {
