@@ -54,7 +54,7 @@ public class FetchReceiptService {
             return response.getBody().prepareReceipt();
         } catch (HttpMessageConversionException e) {
             log.error("Failed to fetch receipt from receipt service", e);
-            throw new FetchDataException("Failed to fetch receipt from receipt service");
+            throw new FetchDataException("Sorry. Failed to fetch receipt from receipt service.");
         }
     }
 
