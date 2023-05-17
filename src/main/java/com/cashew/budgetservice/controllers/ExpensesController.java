@@ -17,10 +17,10 @@ public class ExpensesController {
         this.expensesService = expensesService;
     }
 
-//    @PostMapping
-//    public ResponseEntity<ExpensesDTO.Response.Success> addReceipt(@RequestBody ExpensesDTO.Request.AddReceipt request) {
-//        return expensesService.addReceipt(request.getUsername(), request.getToken());
-//    }
+    @PostMapping
+    public ResponseEntity<ExpensesDTO.Response.Success> addReceipt(@RequestBody ExpensesDTO.Request.AddReceipt request) {
+        return expensesService.addReceipt(request.getOwner(), request.getToken(), request.getShares());
+    }
 
     @GetMapping
     public ResponseEntity<ExpensesDTO.Response.RequestedChecks> getExpenses(@RequestParam String username){

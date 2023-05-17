@@ -5,6 +5,8 @@ import com.cashew.budgetservice.DAO.Entities.Receipt;
 import com.cashew.budgetservice.DAO.Repos.ReceiptRepository;
 import com.cashew.budgetservice.DAO.Repos.UserCheckRepository;
 import com.cashew.budgetservice.DAO.Repos.UserRepository;
+import com.cashew.budgetservice.DTO.ProductShareDTO;
+import com.cashew.budgetservice.DTO.UserExpensesDTO;
 import com.cashew.budgetservice.services.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.when;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class RemoveDataTests {
+
     @TestConfiguration
     static class MyTestConfiguration {
 
@@ -35,6 +37,7 @@ public class RemoveDataTests {
         public FetchReceiptService fetchReceiptServiceMOCK() {
             return Mockito.mock(FetchReceiptService.class);
         }
+
         @Bean
         public ExpensesService expensesService(UserCheckRepository userCheckRepository,
                                                ReceiptRepository receiptRepository,
@@ -51,6 +54,9 @@ public class RemoveDataTests {
     private UsersService usersService;
     private FetchReceiptService fetchReceiptServiceMOCK;
     private String exampleReceiptToken = "t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1";
+    private String username = "TestUser1";
+    private String friendUsername = "friendUser";
+    private String friendRequesterUsername = "friendRequestUser";
 
 
     @Autowired
@@ -66,7 +72,6 @@ public class RemoveDataTests {
         this.fetchReceiptServiceMOCK = fetchReceiptServiceMOCK;
     }
 
-
     @Test
     @Order(1)
     public void testDeleteUserProperly() {
@@ -76,7 +81,7 @@ public class RemoveDataTests {
         * has receipts,
         * is in the party,
         * owns a party*/
-        when(fetchReceiptServiceMOCK.fetchReceipt("testuser1","t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1"))
+        when(fetchReceiptServiceMOCK.fetchReceipt(username.toLowerCase(Locale.ROOT), exampleReceiptToken))
                 .thenReturn(new Receipt()
                         .setCompany("ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ДОМ КОМИКСОВ \"МАЯК\"")
                         .setAddress("190121, г.Санкт-Петербург, наб.Адмиралтейского канала, д.2, литер Т")
@@ -118,22 +123,28 @@ public class RemoveDataTests {
                                 )
                         )
                 );
-        String username = "TestUser1";
-        String friendUsername = "friendUser";
-        String friendRequesterUsername = "friendRequestUser";
+
         usersService.createUser(username,"e@a.com");
         usersService.createUser(friendUsername,"e@b.com");
         usersService.createUser(friendRequesterUsername,"e@c.com");
         friendsService.sendRequest(friendUsername, username);
         friendsService.acceptRequest(friendUsername, username);
         friendsService.sendRequest(friendRequesterUsername, username);
-        expensesService.addReceipt(username, exampleReceiptToken);
+        expensesService.addReceipt(username, exampleReceiptToken,
+                new ArrayList<>(List.of(new UserExpensesDTO[]{
+                        new UserExpensesDTO().setUsername(username.toLowerCase(Locale.ROOT)).setExpenses(Arrays.asList(
+                                new ProductShareDTO().setName("Фигурка Funko POP! Animation Avatar Spirit Aang (GW) (Exc) 55052").setPrice(2200.0),
+                                new ProductShareDTO().setName("Фигурка Funko POP! Animation Avatar The Last Airbender Appa (540) 36468").setPrice(1000.0)
+                        )),
+                        new UserExpensesDTO().setUsername(friendUsername.toLowerCase(Locale.ROOT)).setExpenses(Arrays.asList(
+                                new ProductShareDTO().setName("Фигурка Funko POP! Animation Avatar The Last Airbender Appa (540) 36468").setPrice(1000.0)
+                        )),
+                }))
+                );
         Long partyId1 = partiesService.createParty("Test Party1", username).getBody().getPartyId();
         Long partyId2 = partiesService.createParty("Test Party2", friendUsername).getBody().getPartyId();
         partiesService.addUserToParty(partyId1, friendUsername);
         partiesService.addUserToParty(partyId2, username);
-        System.out.println(partiesService.getFullInfoOfParty(partyId1).getBody());
-        System.out.println(partiesService.getFullInfoOfParty(partyId2).getBody());
         usersService.deleteUserByUsername(username);
         usersService.deleteUserByUsername(friendUsername);
         usersService.deleteUserByUsername(friendRequesterUsername);

@@ -1,14 +1,12 @@
 package com.cashew.budgetservice.DAO.Entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -31,7 +29,11 @@ public class Product {
 
     private BigDecimal totalPrice;
 
-    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone="GMT")
-    @CreatedDate
-    private LocalDateTime date;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
+    private List<ProductShare> shares;
+
+
+//    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone="GMT")
+//    @CreatedDate
+//    private LocalDateTime date;
 }
