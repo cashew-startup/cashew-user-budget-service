@@ -19,7 +19,7 @@ public class ExpensesController {
 
     @PostMapping
     public ResponseEntity<ExpensesDTO.Response.Success> addReceipt(@RequestBody ExpensesDTO.Request.AddReceipt request) {
-        return expensesService.addReceipt(request.getUsername(), request.getToken());
+        return expensesService.addReceipt(request.getOwner(), request.getToken(), request.getShares());
     }
 
     @GetMapping

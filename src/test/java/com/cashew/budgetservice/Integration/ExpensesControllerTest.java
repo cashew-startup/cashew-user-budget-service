@@ -5,6 +5,8 @@ import com.cashew.budgetservice.DAO.Entities.Receipt;
 import com.cashew.budgetservice.DAO.Repos.ReceiptRepository;
 import com.cashew.budgetservice.DAO.Repos.UserCheckRepository;
 import com.cashew.budgetservice.DAO.Repos.UserRepository;
+import com.cashew.budgetservice.DTO.ProductShareDTO;
+import com.cashew.budgetservice.DTO.UserExpensesDTO;
 import com.cashew.budgetservice.exceptions.FetchDataException;
 import com.cashew.budgetservice.services.ExpensesService;
 import com.cashew.budgetservice.services.FetchReceiptService;
@@ -24,7 +26,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -39,6 +46,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ExpensesControllerTest {
     private final UsersService usersService;
     private MockMvc mockMvc;
+
+    String username = "TestUser1";
+    String friendUsername = "TestUser2";
 
     @TestConfiguration
     static class MyTestConfiguration {
@@ -66,12 +76,8 @@ public class ExpensesControllerTest {
 
     @BeforeAll
     public void setUp() {
-        usersService.createUser("TestUser1", "example@g.com");
-    }
-
-    @AfterAll
-    void closeUp(){
-        usersService.deleteUserByUsername("TestUser1");
+        usersService.createUser(username, "example@g.com");
+        usersService.createUser(friendUsername, "example@y.com");
     }
 
     @Test
@@ -80,28 +86,28 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/day")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("username", "TestUser1"))
+                        .param("username", username))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").isEmpty());
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/week")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("username", "TestUser1"))
+                        .param("username", username))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").isEmpty());
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/year")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("username", "TestUser1"))
+                        .param("username", username))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").isEmpty());
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/period")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("username", "TestUser1")
+                        .param("username", username)
                         .param("from", "2022-09-01")
                         .param("to", "2023-03-01"))
                 .andExpect(status().isOk())
@@ -113,24 +119,41 @@ public class ExpensesControllerTest {
     @Test
     @Order(2)
     public void testAddReceiptWithWrongToken() throws Exception {
-        when(fetchReceiptServiceMOCK.fetchReceipt("testuser1","bebra"))
-                .thenThrow(new FetchDataException("Failed to fetch receipt from receipt service"));
+        when(fetchReceiptServiceMOCK.fetchReceipt(username.toLowerCase(Locale.ROOT),"bebra"))
+                .thenThrow(new FetchDataException("Sorry. Failed to fetch receipt from receipt service."));
         this.mockMvc
                 .perform(post("http://localhost:8080/api/v1/expenses")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                    "username": "TestUser1",
-                                    "token": "bebra"
-                                }"""))
+                                    "owner": "%s",
+                                    "token": "bebra",
+                                    "shares": [
+                                        {
+                                            "username": "%s",
+                                            "expenses": [
+                                                {
+                                                    "name": "Фигурка Funko POP! Animation Avatar Spirit Aang (GW) (Exc) 55052",
+                                                    "price": 2200.0
+                                                },
+                                                {
+                                                    "name": "Фигурка Funko POP! Animation Avatar The Last Airbender Appa (540) 36468",
+                                                    "price": 2000.0
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }""".formatted(username, username)))
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("description").value("Failed to fetch receipt from receipt service"));
+                .andExpect(jsonPath("description").value("Sorry. Failed to fetch receipt from receipt service."));
     }
     @Test
     @Order(3)
     public void testAddReceiptSuccessfully() throws Exception {
-        when(fetchReceiptServiceMOCK.fetchReceipt("testuser1","t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1"))
+        when(fetchReceiptServiceMOCK.fetchReceipt(
+                username.toLowerCase(Locale.ROOT),
+                "t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1"))
                 .thenReturn(new Receipt()
                                 .setCompany("ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ДОМ КОМИКСОВ \"МАЯК\"")
                                 .setAddress("190121, г.Санкт-Петербург, наб.Адмиралтейского канала, д.2, литер Т")
@@ -177,9 +200,33 @@ public class ExpensesControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                    "username": "TestUser1",
-                                    "token": "t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1"
-                                }"""))
+                                    "owner": "%s",
+                                    "token": "t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1",
+                                    "shares": [
+                                        {
+                                            "username": "%s",
+                                            "expenses": [
+                                                {
+                                                    "name": "Фигурка Funko POP! Animation Avatar Spirit Aang (GW) (Exc) 55052",
+                                                    "price": 2200.0
+                                                },
+                                                {
+                                                    "name": "Фигурка Funko POP! Animation Avatar The Last Airbender Appa (540) 36468",
+                                                    "price": 1000.0
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "username": "%s",
+                                            "expenses": [
+                                            {
+                                                "name": "Фигурка Funko POP! Animation Avatar The Last Airbender Appa (540) 36468",
+                                                "price": 1000.0
+                                            }
+                                            ]
+                                        }
+                                    ]
+                                }""".formatted(username, username, friendUsername)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("success").value("true"));
@@ -188,7 +235,7 @@ public class ExpensesControllerTest {
     @Test
     @Order(4)
     public void testAddCheckAndDisableIt() throws Exception {
-        when(fetchReceiptServiceMOCK.fetchReceipt("testuser1","t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1"))
+        when(fetchReceiptServiceMOCK.fetchReceipt(username.toLowerCase(Locale.ROOT),"t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1"))
                 .thenReturn(new Receipt()
                         .setCompany("ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ДОМ КОМИКСОВ \"МАЯК\"")
                         .setAddress("190121, г.Санкт-Петербург, наб.Адмиралтейского канала, д.2, литер Т")
@@ -235,16 +282,47 @@ public class ExpensesControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                    "username": "TestUser1",
-                                    "token": "t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1"
-                                }"""))
+                                    "owner": "%s",
+                                    "token": "t=20230120T2027&s=4200.00&fn=9961440300674259&i=3790&fp=2608575326&n=1",
+                                    "shares": [
+                                        {
+                                            "username": "%s",
+                                            "expenses": [
+                                                {
+                                                    "name": "Фигурка Funko POP! Animation Avatar Spirit Aang (GW) (Exc) 55052",
+                                                    "price": 2200.0
+                                                },
+                                                {
+                                                    "name": "Фигурка Funko POP! Animation Avatar The Last Airbender Appa (540) 36468",
+                                                    "price": 2000.0
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }""".formatted(username, username)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("success").value("true"));
+        String receipts = this.mockMvc
+                .perform(get("http://localhost:8080/api/v1/expenses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("username", username))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        System.out.println("\n=\n=\n=\n=\n=\n=\n=\n="+receipts+"\n=\n=\n=\n=\n=\n=\n=\n=");
+        Pattern p = Pattern.compile("\"id\":(\\d*)");
+        Matcher m = p.matcher(receipts);
+        long id = 0;
+        if(m.find()) {
+            id = Long.parseLong(m.group(1));
+        }
+
         this.mockMvc
                 .perform(delete("http://localhost:8080/api/v1/expenses")
-                        .param("username","TestUser1")
-                        .param("receiptId", "2"))
+                        .param("username", username)
+                        .param("receiptId", Long.toString(id)))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -257,7 +335,7 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("username", "TestUser1"))
+                        .param("username", username))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
@@ -265,7 +343,7 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/day")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("username", "TestUser1"))
+                        .param("username", username))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
@@ -273,7 +351,7 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/week")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("username", "TestUser1"))
+                        .param("username", username))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
@@ -281,7 +359,7 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/month")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("username", "TestUser1"))
+                        .param("username", username))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
@@ -289,7 +367,7 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/year")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("username", "TestUser1"))
+                        .param("username", username))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("expenses").exists())
@@ -297,7 +375,7 @@ public class ExpensesControllerTest {
         this.mockMvc
                 .perform(get("http://localhost:8080/api/v1/expenses/period")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("username", "TestUser1")
+                        .param("username", username)
                         .param("from", "2022-09-01")
                         .param("to", "2023-03-01"))
                 .andExpect(status().isOk())

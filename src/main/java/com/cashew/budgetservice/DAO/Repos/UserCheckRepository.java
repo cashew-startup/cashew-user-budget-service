@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface UserCheckRepository extends CrudRepository<UserCheck,Long> {
 
@@ -14,6 +15,12 @@ public interface UserCheckRepository extends CrudRepository<UserCheck,Long> {
             "where uc.userDetails.id = ?1 " +
             "and uc.isDisabled = ?2 ")
     List<UserCheck> findAllByUserDetailsIdAndIsDisabled(Long UserDetailsId, boolean isDisabled);
+
+    @Query(value = "SELECT uc FROM UserCheck uc " +
+            "JOIN uc.receipt r " +
+            "where uc.userDetails.id = ?1 " +
+            "and uc.receipt.id = ?2 ")
+    Optional<UserCheck> findByUserDetailsIdAndReceiptId(Long UserDetailsId, Long receiptId);
 
     @Query(value = "SELECT uc FROM UserCheck uc " +
             "JOIN uc.receipt r " +
@@ -28,4 +35,6 @@ public interface UserCheckRepository extends CrudRepository<UserCheck,Long> {
             "and uc.userDetails.id = ?1 " +
             "and uc.isDisabled = false ")
     List<UserCheck> findAllByUserDetailsIdAndDateIn(Long userDetailsId, ZonedDateTime from, ZonedDateTime to);
+
+    List<UserCheck> findAllByUserDetailsId(long userDetailsId);
 }

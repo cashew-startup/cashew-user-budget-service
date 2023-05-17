@@ -19,6 +19,8 @@ public enum ExpensesDTO {;
     private interface From { String getFrom(); }
     private interface To { String getTo(); }
     private interface FetchedReceipt { Receipt getFetchedReceipt(); }
+    public interface Owner { String getOwner(); }
+    public interface Shares { List<UserExpensesDTO> getShares(); }
 
     public enum Request{;
 
@@ -30,10 +32,10 @@ public enum ExpensesDTO {;
         }
 
         @Data
-        public static class AddReceipt implements Token {
+        public static class AddReceipt implements Token, Owner, Shares{
             String owner;
             String token;
-            List<UserExpensesDTO> expenses;
+            List<UserExpensesDTO> shares;
         }
 
         @Data
@@ -57,7 +59,7 @@ public enum ExpensesDTO {;
         }
 
         @Data
-        public static class perCustomPeriod implements Username {
+        public static class perCustomPeriod implements Username, From, To {
             String username;
             @JsonFormat(pattern = "yyyy-MM-dd")
             String from;

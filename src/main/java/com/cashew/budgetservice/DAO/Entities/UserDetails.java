@@ -1,6 +1,7 @@
 package com.cashew.budgetservice.DAO.Entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -48,5 +49,10 @@ public class UserDetails {
             joinColumns = @JoinColumn(name = "user_details_id"),
             inverseJoinColumns = @JoinColumn(name = "party_id")
     )
+
     private List<Party> parties;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userDetails")
+    @JsonIgnore
+    private List<ProductShare> productShares;
 }
